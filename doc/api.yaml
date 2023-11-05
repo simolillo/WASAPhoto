@@ -2,9 +2,6 @@
 # summary: lower case no period
 # description: Upper case and period.
 
-# As part of the Web and Software Architecture exam, you will:
-#
-# 1. define APIs using the OpenAPI standard
 
 openapi: 3.0.0
 info:
@@ -65,16 +62,26 @@ components:
       description: User ID.
       schema: { $ref: '#/components/schemas/UserID' }
     
+    PhotoID:
+      name: pid
+      in: path
+      required: true
+      description: Photo ID.
+      schema: { $ref: '#/components/schemas/PhotoID' }
+
 
   responses:
     
     Forbidden:
-      description: >
-        The user is unauthorized to act on somebody else's account.
+      description: |
+        The user is unauthorized to act on somebody else's account or
+        he is trying to access restricted information or
+        he is trying to like or comment a photo on behalf of somebody else.
 
         i.e. the ID of the user attempting the request
-        is different from the one he wants to edit the
-        account of.
+        is different from the one he wants to edit the account of or
+        is different from the one of the account he wants to retrieve information of or
+        is different from the one of the account liking or commenting.
 
 
 
@@ -219,3 +226,155 @@ paths:
 
             i.e. the ID of the user to be removed from the 'following' list
             is not present in the list.
+  
+
+  /users/{uid}/banned/{uid}:
+    parameters:
+      - $ref: '#/components/parameters/UserID'
+    
+    put:
+      operationId: banUser
+      summary: ban a user
+      description: >
+        Add an existing user to the personal 'banned' list of users.
+
+        The operation is allowed if and only if
+        it is the owner of the account to do it.
+      responses:
+        "200":
+          # OK
+          description: |
+            User successfully added to the personal 'banned' list of users;
+            his/her ID is in the content.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UserID' }
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+        "422":
+          # Unprocessable Content
+          description: >
+            The request was syntactically correct 
+            but was unable to be followed due to semantic errors:
+
+            the ID of the user to be added to the 'banned' list
+            does not match any existing account.
+    
+    delete:
+      operationId: unbanUser
+      summary: unban a user
+      description: >
+        Remove a user from the personal 'banned' list of users.
+
+        The operation is allowed if and only if
+        it is the owner of the account to do it.
+      responses:
+        "200":
+          # OK
+          description: |
+            User successfully removed from the personal 'banned' list of users;
+            his/her ID is in the content.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UserID' }
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          # Not Found
+          description: >
+            The server cannot find the requested resource.
+
+            i.e. the ID of the user to be removed from the 'banned' list
+            is not present in the list.
+  
+
+  /users/:
+    
+    get:
+      operationId: getUserProfile
+      summary: visit the profile page of a user
+      description: >
+        Visit the profile page of a user (user's photos, followers and following).
+        The ID of the user can be specified in the query.
+      # ex.
+      # /users/?uid=1234
+      parameters:
+        - name: uid
+          in: query
+          required: true
+          description: User ID of the visited user.
+          schema: { $ref: '#/components/schemas/UserID' }
+      responses:
+        "200":
+          # OK
+          description: >
+            The user profile page (photos, followers and following)
+            has been successfully fetched and transmitted in the content.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  photos:
+                    type: array
+                    items: { $ref: '#/components/schemas/Photo' }
+                  followers:
+                    type: array
+                    items: { $ref: '#/components/schemas/UserID' }
+                  following:
+                    type: array
+                    items: { $ref: '#/components/schemas/UserID' }
+        "404":
+          # Not Found
+          description: >
+            The server cannot find the requested resource.
+
+            i.e. the ID of the user to be visited
+            does not match any existing account.
+  
+
+  /users/{uid}/stream:
+    parameters:
+      - $ref: '#/components/parameters/UserID'
+    
+    get:
+      operationId: getMyStream
+      summary: show the personal stream of a user
+      description: >
+        Each user will be presented with a stream of photos (images)
+        in reverse chronological order,
+        with information about when each photo was uploaded
+        (date and time)
+        and how many likes and comments it has.
+        The stream is composed by photos from “following”
+        (other users that the user follows).
+      responses:
+        "200":
+          # OK
+          description: >
+            The user personal stream 
+            has been successfully fetched and transmitted in the content.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Photo' }
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+  
+
+  /photos/{pid}/likes/{uid}:
+    parameters:
+      - $ref: '#/components/parameters/UserID'
+      - $ref: '#/components/parameters/PhotoID'
+    
+    put:
+      operationId: likePhoto
+      summary: put a like to a photo
+      description: >
+        Put a like to a photo.
+        The photo ID can be specified in the path.
+        The user ID will be added to the 'likes' collection.
