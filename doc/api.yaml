@@ -22,6 +22,11 @@ components:
 
   schemas:
 
+    UserID:
+      type: number
+      format: integer
+      example: 1
+
     Username:
       type: object
       properties:
@@ -58,10 +63,7 @@ components:
       in: path
       required: true
       description: User ID.
-      schema:
-        type: number
-        format: integer
-        example: 1
+      schema: { $ref: '#/components/schemas/UserID' }
     
 
   responses:
@@ -98,7 +100,9 @@ paths:
       responses:
         "200":
           # OK
-          description: Username successfully updated.
+          description: |
+            Username successfully updated;
+            it is returned in the content.
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Username' }
@@ -138,15 +142,80 @@ paths:
       responses:
         "201":
           # Created
-          description: Photo successfully posted.
+          description: Photo successfully posted; its ID is in the content.
           content:
             application/json:
               schema: { $ref: '#/components/schemas/PhotoID' }
         "400":
           # Bad Request
           description: >
-            The photo is photo is missing from the request body or,
-            it is in a format not supported.
+            The photo is missing from the request body.
         "403":
           # Forbidden
           $ref: '#/components/responses/Forbidden'
+        "415":
+          # Unsupported Media Type
+          description: >
+            The photo is in a format not supported.
+  
+
+  /users/{uid}/following/{uid}:
+    parameters:
+      - $ref: '#/components/parameters/UserID'
+    
+    put:
+      operationId: followUser
+      summary: start following a user
+      description: >
+        Add an existing user to the personal 'following' list of users.
+
+        The operation is allowed if and only if
+        it is the owner of the account to do it.
+      responses:
+        "200":
+          # OK
+          description: |
+            User successfully added to the personal 'following' list of users;
+            his/her ID is in the content.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UserID' }
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+        "422":
+          # Unprocessable Content
+          description: >
+            The request was syntactically correct 
+            but was unable to be followed due to semantic errors:
+
+            the ID of the user to be added to the 'following' list
+            does not match any existing account.
+    
+    delete:
+      operationId: unfollowUser
+      summary: unfollow a user
+      description: >
+        Remove a user from the personal 'following' list of users.
+
+        The operation is allowed if and only if
+        it is the owner of the account to do it.
+      responses:
+        "200":
+          # OK
+          description: |
+            User successfully removed from the personal 'following' list of users;
+            his/her ID is in the content.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UserID' }
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          # Not Found
+          description: >
+            The server cannot find the requested resource.
+
+            i.e. the ID of the user to be removed from the 'following' list
+            is not present in the list.
