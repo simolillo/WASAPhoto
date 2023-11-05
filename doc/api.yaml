@@ -31,6 +31,24 @@ components:
           pattern: '^.*?$'
           minLength: 3
           maxLength: 16
+      
+    Photo:
+      type: object
+      properties:
+        pid:
+          $ref: '#/components/schemas/PhotoID'
+        uploadDateTime:
+          type: string
+          format: date-time
+          example: '2017-07-21T17:32:28Z'
+        photo:
+          type: string
+          format: binary
+      
+    PhotoID:
+      type: number
+      format: integer
+      example: 1
 
 
   parameters:
@@ -53,7 +71,7 @@ components:
         The user is unauthorized to act on somebody else's account.
 
         i.e. the ID of the user attempting the request
-        is different from the one he wants to modify the
+        is different from the one he wants to edit the
         account of.
 
 
@@ -68,7 +86,7 @@ paths:
       operationId: setMyUserName
       summary: set personal username
       description: >
-        Set a new username.
+        Set personal username with the string provided in the request body.
 
         The operation is allowed if and only if
         it is the owner of the account to do it.
@@ -79,16 +97,19 @@ paths:
         required: true
       responses:
         "200":
+          # OK
           description: Username successfully updated.
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Username' }
-        "403":
-          $ref: '#/components/responses/Forbidden'
         "400":
+          # Bad Request
           description: >
             The new username is missing from the request body or,
             the new username is not matching the required string pattern.
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
     
 
   /users/{uid}/photos/:
@@ -101,5 +122,31 @@ paths:
       description: >
         Upload a new photo on personal account.
 
+        The server will create a new unique ID,
+        the client can find it in the response.
+
         The operation is allowed if and only if
         it is the owner of the account to do it.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema: { $ref: '#/components/schemas/Photo' }
+            encoding:
+              photo:
+                contentType: image/png, image/jpeg
+        required: true
+      responses:
+        "201":
+          # Created
+          description: Photo successfully posted.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PhotoID' }
+        "400":
+          # Bad Request
+          description: >
+            The photo is photo is missing from the request body or,
+            it is in a format not supported.
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
