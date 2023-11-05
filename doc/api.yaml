@@ -51,6 +51,26 @@ components:
       type: number
       format: integer
       example: 1
+    
+    CommentID:
+      type: number
+      format: integer
+      example: 1
+
+    Comment:
+      type: object
+      properties:
+        cid:
+          $ref: '#/components/schemas/CommentID'
+        author:
+          $ref: '#/components/schemas/UserID'
+        uploadDateTime:
+          type: string
+          format: date-time
+          example: '2017-07-21T17:32:28Z'
+        text:
+          type: string
+          example: Amazing photo!
 
 
   parameters:
@@ -68,6 +88,13 @@ components:
       required: true
       description: Photo ID.
       schema: { $ref: '#/components/schemas/PhotoID' }
+    
+    CommentID:
+      name: cid
+      in: path
+      required: true
+      description: Comment ID
+      schema: { $ref: '#/components/schemas/CommentID' }
 
 
   responses:
@@ -368,8 +395,8 @@ paths:
 
   /photos/{pid}/likes/{uid}:
     parameters:
-      - $ref: '#/components/parameters/UserID'
       - $ref: '#/components/parameters/PhotoID'
+      - $ref: '#/components/parameters/UserID'
     
     put:
       operationId: likePhoto
@@ -377,4 +404,148 @@ paths:
       description: >
         Put a like to a photo.
         The photo ID can be specified in the path.
-        The user ID will be added to the 'likes' collection.
+        The user ID will be added to the 'likes' collection of that photo.
+      responses:
+        "204":
+          # No Content
+          description: |
+            The request has succeeded meaning:
+            the like has been put to the specified photo and
+            the user ID has been added to the 'likes' collection of that photo.
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          # Not Found
+          description: >
+            The server cannot find the requested resource.
+
+            i.e. the ID of the specified photo
+            does not match any existing photo.
+    
+    delete:
+      operationId: unlikePhoto
+      summary: delete a like from a photo
+      description: >
+        Delete a like from a photo.
+        The photo ID can be specified in the path.
+        The user ID will be deleted from the 'likes' collection of that photo.
+      responses:
+        "204":
+          # No Content
+          description: |
+            The request has succeeded meaning:
+            the like has been deleted from the specified photo and
+            the user ID has been deleted from the 'likes' collection of that photo.
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          # Not Found
+          description: >
+            The server cannot find the requested resource.
+
+            i.e. the ID of the specified photo
+            does not match any existing photo.
+  
+
+  /photos/{pid}/comments/:
+    parameters:
+      - $ref: '#/components/parameters/PhotoID'
+    
+    post:
+      operationId: commentPhoto
+      summary: comment under a photo
+      description: |
+        Comment under a photo.
+        The photo ID can be specified in the path.
+        The comment will be added to the 'comments' list of that photo.
+        The server will create a new unique ID,
+        the client can find it in the response.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Comment' }
+      responses:
+        "201":
+          # Created
+          description: Comment successfully created; its ID is in the content.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CommentID' }
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          # Not Found
+          description: >
+            The server cannot find the requested resource.
+
+            i.e. the ID of the specified photo
+            does not match any existing photo.
+  
+
+  /photos/{pid}/comments/{cid}:
+    parameters:
+      - $ref: '#/components/parameters/PhotoID'
+      - $ref: '#/components/parameters/CommentID'
+    
+    delete:
+      operationId: uncommentPhoto
+      summary: delete a comment under a photo
+      description: |
+        Delete a comment under a photo if and only if the author of the comment.
+        The photo ID can be specified in the path.
+        The comment ID can be specified in the path.
+        The comment will be deleted from the 'comments' list of that photo.
+      responses:
+        "200":
+          # OK
+          description: |
+            Comment successfully removed from the 'comment' list of specified photo;
+            its ID is in the content.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CommentID' }
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          # Not Found
+          description: >
+            The server cannot find the requested resource.
+
+            i.e. the ID of the comment to be removed from the 'comment' list
+            is not present in the list or,
+            the ID of the specified photo does not match any
+            existing photo.
+  
+
+  /users/{uid}/photos/{pid}:
+    parameters:
+      - $ref: '#/components/parameters/UserID'
+      - $ref: '#/components/parameters/PhotoID'
+  
+    delete:
+      operationId: DeletePhoto
+      summary: delete photo
+      description: |
+        Delete previously uploaded photo.
+        The photo ID can be specified in the path.
+        The operation is allowed if and only if it is the owner of the account to do it.
+      responses:
+        "204":
+          # No Content
+          description: |
+            The request has succeeded meaning:
+            the photo has been correctly deleted from the account.
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          # Not Found
+          description: >
+            The server cannot find the requested resource.
+
+            i.e. the ID of the specified photo does not match any
+            existing photo.
