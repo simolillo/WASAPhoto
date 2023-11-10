@@ -118,7 +118,12 @@ components:
 
   responses:
     
+    Unauthorized:
+      # 401
+      description: The client must authenticate itself to get the requested response.
+    
     Forbidden:
+      # 403
       description: |
         The server understands the request but refuses to authorize it due to one or many of the following possibilities:
 
@@ -131,6 +136,15 @@ components:
         2. different from the one of the account he wants to retrieve information of or
         3. different from the one of the account liking or commenting.
 
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+
+security:
+  - bearerAuth: []
 
 
 paths:
@@ -167,6 +181,9 @@ paths:
           description: >
             The new username is missing from the request body or,
             the new username is not matching the required string pattern.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         "403":
           # Forbidden
           $ref: '#/components/responses/Forbidden'
@@ -207,6 +224,9 @@ paths:
           # Bad Request
           description: >
             The photo is missing from the request body.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         "403":
           # Forbidden
           $ref: '#/components/responses/Forbidden'
@@ -239,6 +259,9 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/UserID' }
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         "403":
           # Forbidden
           $ref: '#/components/responses/Forbidden'
@@ -269,6 +292,9 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/UserID' }
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         "403":
           # Forbidden
           $ref: '#/components/responses/Forbidden'
@@ -304,6 +330,9 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/UserID' }
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         "403":
           # Forbidden
           $ref: '#/components/responses/Forbidden'
@@ -334,6 +363,9 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/UserID' }
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         "403":
           # Forbidden
           $ref: '#/components/responses/Forbidden'
@@ -430,6 +462,9 @@ paths:
                 items: { $ref: '#/components/schemas/Photo' }
                 minItems: 0
                 maxItems: 12
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         "403":
           # Forbidden
           $ref: '#/components/responses/Forbidden'
@@ -458,6 +493,9 @@ paths:
             The request has succeeded meaning:
             the like has been put to the specified photo and
             the user ID has been added to the 'likes' collection of that photo.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         "403":
           # Forbidden
           $ref: '#/components/responses/Forbidden'
@@ -487,6 +525,9 @@ paths:
             The request has succeeded meaning:
             the like has been deleted from the specified photo and
             the user ID has been deleted from the 'likes' collection of that photo.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         "403":
           # Forbidden
           $ref: '#/components/responses/Forbidden'
@@ -527,6 +568,9 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/CommentID' }
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         "403":
           # Forbidden
           $ref: '#/components/responses/Forbidden'
@@ -558,6 +602,9 @@ paths:
           # No Content
           description: |
             Comment successfully removed from the 'comment' list of specified photo.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         "403":
           # Forbidden
           $ref: '#/components/responses/Forbidden'
@@ -591,6 +638,9 @@ paths:
           description: |
             The request has succeeded meaning:
             the photo has been correctly deleted from the account.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         "403":
           # Forbidden
           $ref: '#/components/responses/Forbidden'
