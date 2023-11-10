@@ -377,12 +377,18 @@ paths:
                   photos:
                     type: array
                     items: { $ref: '#/components/schemas/Photo' }
+                    minItems: 0
+                    maxItems: 12
                   followers:
                     type: array
                     items: { $ref: '#/components/schemas/UserID' }
+                    minItems: 0
+                    maxItems: 30
                   following:
                     type: array
                     items: { $ref: '#/components/schemas/UserID' }
+                    minItems: 0
+                    maxItems: 30
         "404":
           # Not Found
           description: >
@@ -422,6 +428,8 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/Photo' }
+                minItems: 0
+                maxItems: 12
         "403":
           # Forbidden
           $ref: '#/components/responses/Forbidden'
