@@ -82,7 +82,14 @@ components:
       required: true
       description: User ID.
       schema: { $ref: '#/components/schemas/UserID' }
-    
+
+    UserID2:
+      name: uid2
+      in: path
+      required: true
+      description: Second user ID in the path.
+      schema: { $ref: '#/components/schemas/UserID' }
+
     PhotoID:
       name: pid
       in: path
@@ -196,9 +203,10 @@ paths:
             The photo is in a format not supported.
 
 
-  /users/{uid}/following/{uid}:
+  /users/{uid}/following/{uid2}:
     parameters:
       - $ref: '#/components/parameters/UserID'
+      - $ref: '#/components/parameters/UserID2'
     
     put:
       operationId: followUser
@@ -258,9 +266,10 @@ paths:
             is not present in the list.
   
 
-  /users/{uid}/banned/{uid}:
+  /users/{uid}/banned/{uid2}:
     parameters:
       - $ref: '#/components/parameters/UserID'
+      - $ref: '#/components/parameters/UserID2'
     
     put:
       operationId: banUser
