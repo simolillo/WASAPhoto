@@ -15,6 +15,14 @@ info:
     and they will be visible to everyone following you.
   version: 0.0.1
 
+tags:
+  - name: browsing
+  - name: user
+    description: All operations realted to users managing theri own profile.
+  - name: photo
+    description: All operations related to users interacting with a photo.
+  - name: login
+
 
 components:
 
@@ -40,8 +48,8 @@ components:
       properties:
         name:
           type: string
-          example: Maria
           pattern: '^.*?$'
+          example: Maria
           minLength: 3
           maxLength: 16
       
@@ -130,6 +138,7 @@ paths:
 
     put:
       operationId: setMyUserName
+      tags: [user]
       summary: set personal username
       description: >
         Set personal username with the string provided in the request body.
@@ -166,6 +175,7 @@ paths:
     
     post:
       operationId: uploadPhoto
+      tags: [user]
       summary: upload a new photo on personal account
       description: >
         Upload a new photo on personal account.
@@ -210,6 +220,7 @@ paths:
     
     put:
       operationId: followUser
+      tags: [user]
       summary: start following a user
       description: >
         Add an existing user to the personal 'following' list of users.
@@ -239,6 +250,7 @@ paths:
     
     delete:
       operationId: unfollowUser
+      tags: [user]
       summary: unfollow a user
       description: >
         Remove a user from the personal 'following' list of users.
@@ -273,6 +285,7 @@ paths:
     
     put:
       operationId: banUser
+      tags: [user]
       summary: ban a user
       description: >
         Add an existing user to the personal 'banned' list of users.
@@ -302,6 +315,7 @@ paths:
     
     delete:
       operationId: unbanUser
+      tags: [user]
       summary: unban a user
       description: >
         Remove a user from the personal 'banned' list of users.
@@ -333,6 +347,7 @@ paths:
     
     get:
       operationId: getUserProfile
+      tags: [browsing]
       summary: visit the profile page of a user
       description: >
         Visit the profile page of a user (user's photos, followers and following).
@@ -380,6 +395,7 @@ paths:
     
     get:
       operationId: getMyStream
+      tags: [browsing]
       summary: show the personal stream of a user
       description: >
         Each user will be presented with a stream of photos (images)
@@ -415,6 +431,7 @@ paths:
     
     put:
       operationId: likePhoto
+      tags: [photo]
       summary: put a like to a photo
       description: >
         Put a like to a photo.
@@ -443,6 +460,7 @@ paths:
     
     delete:
       operationId: unlikePhoto
+      tags: [photo]
       summary: delete a like from a photo
       description: >
         Delete a like from a photo.
@@ -476,6 +494,7 @@ paths:
     
     post:
       operationId: commentPhoto
+      tags: [photo]
       summary: comment under a photo
       description: >
         Comment under a photo.
@@ -516,6 +535,7 @@ paths:
     
     delete:
       operationId: uncommentPhoto
+      tags: [photo]
       summary: delete a comment under a photo
       description: |
         Delete a comment under a photo if and only if it is the author of the comment to do it.
@@ -548,7 +568,8 @@ paths:
   
     delete:
       operationId: DeletePhoto
-      summary: delete photo
+      tags: [user]
+      summary: delete a photo from personal account
       description: |
         Delete previously uploaded photo.
         The photo ID can be specified in the path.
@@ -574,15 +595,15 @@ paths:
   /session:
 
     post:
-      tags: ["login"]
-      summary: Logs in the user
+      operationId: doLogin
+      tags: [login]
+      summary: logs in the user
       description: |-
         If the user does not exist, it will be created,
         and an identifier is returned.
         If the user exists, the user identifier is returned.
-      operationId: doLogin
       requestBody:
-        description: User details
+        description: User details.
         content:
           application/json:
             schema:
@@ -590,15 +611,15 @@ paths:
               properties:
                 name:
                   type: string
-                  example: Maria
                   pattern: '^.*?$'
+                  example: Maria
                   minLength: 3
                   maxLength: 16
         required: true
       responses:
         "201":
           # Created
-          description: User log-in action successful
+          description: User log-in action successful.
           content:
             application/json:
               schema:
