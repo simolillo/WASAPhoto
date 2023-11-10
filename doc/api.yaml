@@ -80,6 +80,8 @@ components:
         text:
           type: string
           example: Amazing photo!
+          minLength: 1
+          maxLength: 2200
 
 
   parameters:
@@ -606,15 +608,7 @@ paths:
         description: User details.
         content:
           application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  pattern: '^.*?$'
-                  example: Maria
-                  minLength: 3
-                  maxLength: 16
+            schema: { $ref: '#/components/schemas/Username' }
         required: true
       responses:
         "201":
@@ -622,8 +616,4 @@ paths:
           description: User log-in action successful.
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  uid:
-                    $ref: '#/components/schemas/UserID'
+              schema: { $ref: '#/components/schemas/UserID' }
