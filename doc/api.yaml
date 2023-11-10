@@ -79,6 +79,7 @@ components:
           example: '2017-07-21T17:32:28Z'
         text:
           type: string
+          pattern: '^.*?$'
           example: Amazing photo!
           minLength: 1
           maxLength: 2200
