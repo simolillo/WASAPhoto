@@ -400,6 +400,7 @@ paths:
     get:
       operationId: getUserProfile
       tags: [browsing]
+      security: [] # no security needed assuming all profiles are private i.e. everyone can visit a profile
       summary: visit the profile page of a user
       description: >
         Visit the profile page of a user (user's photos, followers and following).
