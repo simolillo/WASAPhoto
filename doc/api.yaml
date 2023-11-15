@@ -17,11 +17,13 @@ info:
 
 tags:
   - name: browsing
+    description: All operations realted to users browsing.
   - name: user
     description: All operations realted to users managing theri own profile.
   - name: photo
     description: All operations related to users interacting with a photo.
   - name: login
+    description: All operations realted to users logging in.
 
 
 components:
@@ -29,21 +31,25 @@ components:
   schemas:
 
     UserID:
+      description: User identifier.
       type: number
       format: integer
       example: 1
       
     PhotoID:
+      description: Photo identifier.
       type: number
       format: integer
       example: 1
     
     CommentID:
+      description: Comment identifier.
       type: number
       format: integer
       example: 1
 
     Username:
+      description: Username of a user.
       type: object
       properties:
         name:
@@ -54,6 +60,7 @@ components:
           maxLength: 16
       
     Photo:
+      description: This object represents a photo.
       type: object
       properties:
         pid:
@@ -71,6 +78,7 @@ components:
           maxLength: 99999999999999999999
 
     Comment:
+      description: This object represents a comment.
       type: object
       properties:
         cid:
