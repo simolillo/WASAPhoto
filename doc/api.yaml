@@ -62,9 +62,13 @@ components:
           type: string
           format: date-time
           example: '2017-07-21T17:32:28Z'
+          minLength: 20
+          maxLength: 20
         photo:
           type: string
           format: binary
+          minLength: 1
+          maxLength: 99999999999999999999
 
     Comment:
       type: object
@@ -77,6 +81,8 @@ components:
           type: string
           format: date-time
           example: '2017-07-21T17:32:28Z'
+          minLength: 20
+          maxLength: 20
         text:
           type: string
           pattern: '^.*?$'
