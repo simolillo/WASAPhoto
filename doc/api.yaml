@@ -53,6 +53,7 @@ components:
       type: object
       properties:
         name:
+          description: Name.
           type: string
           pattern: '^.*?$'
           example: Maria
@@ -64,14 +65,17 @@ components:
       type: object
       properties:
         pid:
+          description: Photo ID. 
           $ref: '#/components/schemas/PhotoID'
         uploadDateTime:
+          description: Upload date and time.
           type: string
           format: date-time
           example: '2017-07-21T17:32:28Z'
           minLength: 20
           maxLength: 20
         photo:
+          description: Photo file.
           type: string
           format: binary
           minLength: 1
@@ -82,16 +86,20 @@ components:
       type: object
       properties:
         cid:
+          description: Comment ID.
           $ref: '#/components/schemas/CommentID'
         author:
+          description: Who has written the comment.
           $ref: '#/components/schemas/UserID'
         uploadDateTime:
+          description: Upload date and time.
           type: string
           format: date-time
           example: '2017-07-21T17:32:28Z'
           minLength: 20
           maxLength: 20
         text:
+          description: Text of the comment.
           type: string
           pattern: '^.*?$'
           example: Amazing photo!
@@ -417,16 +425,19 @@ paths:
                 type: object
                 properties:
                   photos:
+                    description: Array of photos.
                     type: array
                     items: { $ref: '#/components/schemas/Photo' }
                     minItems: 0
                     maxItems: 12
                   followers:
+                    description: Array of follower users.
                     type: array
                     items: { $ref: '#/components/schemas/UserID' }
                     minItems: 0
                     maxItems: 30
                   following:
+                    description: Array of following users.
                     type: array
                     items: { $ref: '#/components/schemas/UserID' }
                     minItems: 0
