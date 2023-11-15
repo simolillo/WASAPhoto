@@ -3,23 +3,6 @@
 # description: Upper case and period.
 
 
-
-
-
-
-# COMMUNICATION:
-# I don't agree with one correction:
-# "Operation responses' should use status code 400 instead of 422 for invalid request payloads"
-# I decided to choose 422 instead of 400 because 400 refers to bad SYNTAX, on teh other hand 422 is indicated fot bad SEMANTICS
-# In this case the syntax is correct, bad the user ID doesn't match any existing one
-#
-# Not sure if this is correct, this is what i found on the internet.
-
-
-
-
-
-
 openapi: 3.0.0
 info:
   title: WASAPhoto
@@ -276,20 +259,17 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/UserID' }
+        "400":
+          # Bad Request
+          description: >
+            The ID of the user to be added to the 'following' list
+            does not match any existing account.
         "401":
           # Unauthorized
           $ref: '#/components/responses/Unauthorized'
         "403":
           # Forbidden
           $ref: '#/components/responses/Forbidden'
-        "422":
-          # Unprocessable Content
-          description: >
-            The request was syntactically correct 
-            but was unable to be followed due to semantic errors:
-
-            the ID of the user to be added to the 'following' list
-            does not match any existing account.
     
     delete:
       operationId: unfollowUser
@@ -347,20 +327,17 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/UserID' }
+        "400":
+          # Bad Request
+          description: >
+            The ID of the user to be added to the 'banned' list
+            does not match any existing account.
         "401":
           # Unauthorized
           $ref: '#/components/responses/Unauthorized'
         "403":
           # Forbidden
           $ref: '#/components/responses/Forbidden'
-        "422":
-          # Unprocessable Content
-          description: >
-            The request was syntactically correct 
-            but was unable to be followed due to semantic errors:
-
-            the ID of the user to be added to the 'banned' list
-            does not match any existing account.
     
     delete:
       operationId: unbanUser
