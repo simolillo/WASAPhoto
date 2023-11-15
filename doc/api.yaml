@@ -128,14 +128,15 @@ components:
         The server understands the request but refuses to authorize it due to one or many of the following possibilities:
 
         1. the user is trying to act on somebody else's account or
-        2. the user is trying to access information of somebody else's account or
+        2. the user is trying to access private information of somebody else's account or
         3. the user is trying to like or comment a photo on behalf of somebody else's account.
 
         i.e. the ID of the user attempting the request is:
         1. different from the one he wants to edit the account of or
-        2. different from the one of the account he wants to retrieve information of or
+        2. different from the one of the account he wants to retrieve private information of or
         3. different from the one of the account liking or commenting.
 
+        Or simply the user is in the "banned" list of some other user hence is unable to see his profile nor photos.
 
   securitySchemes:
     bearerAuth:
@@ -416,6 +417,9 @@ paths:
                     items: { $ref: '#/components/schemas/UserID' }
                     minItems: 0
                     maxItems: 30
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'        
         "404":
           # Not Found
           description: >
