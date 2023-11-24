@@ -38,8 +38,10 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	GetName() (string, error)
-	SetName(name string) error
+	
+	// Creates a new user in the database. It returns an error
+	CreateUser(User) (User, error)
+	SearchByUsername(targetUser User) (User, bool)
 
 	Ping() error
 }
@@ -57,10 +59,9 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 	// Check if table exists. If not, the database is empty, and we need to create the structure
 	var tableName string
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
+	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
-		sqlStmt := `CREATE TABLE example_table (id INTEGER NOT NULL PRIMARY KEY, name TEXT);`
-		_, err = db.Exec(sqlStmt)
+		err = createDatabase(db)
 		if err != nil {
 			return nil, fmt.Errorf("error creating database structure: %w", err)
 		}
@@ -74,3 +75,25 @@ func New(db *sql.DB) (AppDatabase, error) {
 func (db *appdbimpl) Ping() error {
 	return db.c.Ping()
 }
+
+// This function creates the entire structure of the database (tables and relations) through SQL statements.
+func createDatabase(db *sql.DB) error {
+	tables := [1]string{
+		`CREATE TABLE IF NOT EXISTS users (
+			userID INTEGER NOT NULL PRIMARY KEY,
+			username VARCHAR(16) NOT NULL UNIQUE
+			);`,
+	}
+
+	// execute each SQL statement
+	for t := 0; t < len(tables); t++ {
+		sqlStmt := tables[t]
+		_, err := db.Exec(sqlStmt)
+		
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+} 

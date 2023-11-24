@@ -38,7 +38,7 @@ components:
           description: UserID.
           readOnly: true
           type: number
-          format: integer
+          format: int64
           example: 1
       
     PhotoID:
@@ -49,7 +49,7 @@ components:
           description: PhotoID.
           readOnly: true
           type: number
-          format: integer
+          format: int64
           example: 1
     
     CommentID:
@@ -60,7 +60,7 @@ components:
           description: CommentID.
           readOnly: true
           type: number
-          format: integer
+          format: int64
           example: 1
 
     Username:
@@ -133,7 +133,7 @@ components:
         description: Integer representing UserID.
         readOnly: true
         type: number
-        format: integer
+        format: int64
         example: 1
 
     UserID2:
@@ -145,7 +145,7 @@ components:
         description: Integer representing UserID.
         readOnly: true
         type: number
-        format: integer
+        format: int64
         example: 1
 
     PhotoID:
@@ -157,7 +157,7 @@ components:
         description: Integer representing PhotoID.
         readOnly: true
         type: number
-        format: integer
+        format: int64
         example: 1
     
     CommentID:
@@ -169,7 +169,7 @@ components:
         description: Integer representing CommentID.
         readOnly: true
         type: number
-        format: integer
+        format: int64
         example: 1
 
 
@@ -717,21 +717,42 @@ paths:
     post:
       operationId: doLogin
       tags: [login]
+      security: []
       summary: logs in the user
       description: |-
-        If the user does not exist, it will be created,
-        and an identifier is returned.
-        If the user exists, the user identifier is returned.
+        The login endpoint accepts a username like “Maria” without any password.
+        If the username does not exist, it will be created, and an identifier is returned.
+        If the username exists, the user identifier is returned.
       requestBody:
-        description: User details.
+        description: Username.
         content:
           application/json:
             schema: { $ref: '#/components/schemas/Username' }
         required: true
       responses:
-        "201":
-          # Created
-          description: User log-in action successful.
+        "200":
+          # OK
+          description: |-
+            User log-in action successful.
+            The user ID is returned in the content.
           content:
             application/json:
               schema: { $ref: '#/components/schemas/UserID' }
+        "201":
+          # Created
+          description: |-
+            User sign-in action successful.
+            The user ID has been created and is returned in the content.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UserID' }
+        "400":
+          # Bad Request
+          description: |-
+            The request body is not a parseable JSON or is missing or;
+            the client has entered white spaces only or;
+            the username is not matching the required string pattern or;
+            the username hasn't got the required length.
+        "500":
+          # Internal Server Error
+          description: "doLogin: unable to encode JSON response."
