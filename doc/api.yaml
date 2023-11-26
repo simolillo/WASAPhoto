@@ -741,7 +741,7 @@ paths:
         "201":
           # Created
           description: |-
-            User sign-in action successful.
+            User sign-up action successful.
             The user ID has been created and is returned in the content.
           content:
             application/json:
@@ -755,4 +755,4 @@ paths:
             the username hasn't got the required length.
         "500":
           # Internal Server Error
-          description: "doLogin: unable to encode JSON response."
+          description: "Server error."

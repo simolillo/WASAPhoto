@@ -7,10 +7,12 @@ import (
 // Handler returns an instance of httprouter.Router that handle APIs registered here
 func (rt *_router) Handler() http.Handler {
 	// Register routes
+
+	// Login endpoint
 	rt.router.POST("/session", rt.wrap(rt.doLogin))
-	rt.router.GET("/", rt.getHelloWorld)
 
 	// Special routes
+	rt.router.GET("/tables", rt.wrap(rt.showTables))
 	rt.router.GET("/liveness", rt.liveness)
 
 	return rt.router

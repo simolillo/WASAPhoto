@@ -39,10 +39,16 @@ import (
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
 	
-	// Creates a new user in the database. It returns an error
+	// Creates a new user in the database.
 	CreateUser(User) (User, error)
+
+	// Searches for a specific user in the database given its username.
 	SearchByUsername(targetUser User) (User, bool)
 
+	// ____________________________________  Show Table ____________________________________
+
+	ShowUsersTable() ([]User, error)
+	
 	Ping() error
 }
 
