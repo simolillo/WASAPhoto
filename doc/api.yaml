@@ -30,17 +30,30 @@ components:
 
   schemas:
 
+    Username:
+      description: Username.
+      type: string
+      pattern: '^.*?$'
+      example: Maria
+      minLength: 3
+      maxLength: 16
+
     UserID:
-      description: User identifier.
+      description: UserID.
+      readOnly: true
+      type: number
+      format: int64
+      example: 1
+
+    User:
+      description: This object represents a user.
       type: object
       properties:
-        userID:
-          description: UserID.
-          readOnly: true
-          type: number
-          format: int64
-          example: 1
-      
+        username:
+          $ref: '#/components/schemas/Username'
+        uid:
+          $ref: '#/components/schemas/UserID'
+
     PhotoID:
       description: Photo identifier.
       type: object
@@ -51,36 +64,12 @@ components:
           type: number
           format: int64
           example: 1
-    
-    CommentID:
-      description: Comment identifier.
-      type: object
-      properties:
-        commentID:
-          description: CommentID.
-          readOnly: true
-          type: number
-          format: int64
-          example: 1
-
-    Username:
-      description: Username of a user.
-      type: object
-      properties:
-        username:
-          description: Username.
-          type: string
-          pattern: '^.*?$'
-          example: Maria
-          minLength: 3
-          maxLength: 16
       
     Photo:
       description: This object represents a photo.
       type: object
       properties:
         pid:
-          description: Photo ID. 
           $ref: '#/components/schemas/PhotoID'
         uploadDateTime:
           description: Upload date and time.
@@ -96,15 +85,24 @@ components:
           minLength: 1
           maxLength: 99999999999999999999
 
+    CommentID:
+      description: Comment identifier.
+      type: object
+      properties:
+        commentID:
+          description: CommentID.
+          readOnly: true
+          type: number
+          format: int64
+          example: 1
+
     Comment:
       description: This object represents a comment.
       type: object
       properties:
         cid:
-          description: Comment ID.
           $ref: '#/components/schemas/CommentID'
         author:
-          description: Who has written the comment.
           $ref: '#/components/schemas/UserID'
         uploadDateTime:
           description: Upload date and time.
@@ -737,7 +735,7 @@ paths:
             The user ID is returned in the content.
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/UserID' }
+              schema: { $ref: '#/components/schemas/User' }
         "201":
           # Created
           description: |-
@@ -745,7 +743,7 @@ paths:
             The user ID has been created and is returned in the content.
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/UserID' }
+              schema: { $ref: '#/components/schemas/User' }
         "400":
           # Bad Request
           description: |-
