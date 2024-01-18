@@ -2,6 +2,21 @@
 # summary: lower case no period
 # description: Upper case and period.
 
+# https://yaml-multiline.info
+
+# Block Style Indicator:
+#   how newlines inside the block should behave
+#   . literal style (|): keep newlines
+#   . folded style (>): replace newlines by spaces
+#       (to get a newline using the folded style
+#       leave a blank line by putting two newlines in)
+
+# Block Chomping Indicator:
+#   how newlines at the end of the block should behave
+#   . clip (clip): put single newline at the end of the block
+#   . strip (-): remove all newlines at the end of the block
+#   . keep (+): keep all newlines at the end of the block
+
 
 openapi: 3.0.0
 info:

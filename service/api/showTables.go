@@ -24,22 +24,23 @@ func (rt *_router) showTables(w http.ResponseWriter, r *http.Request, ps httprou
 	switch tableName {
 	case "":
 		w.WriteHeader(http.StatusBadRequest) //400
-		fmt.Fprintln(w, "showTable: no table specified")
+		fmt.Fprint(w, "\nshowTable: no table specified\n\n")
 	case "users" :
 		users, err := rt.db.ShowUsersTable()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError) //500
 			ctx.Logger.WithError(err).Error("showTables: unable to show \"users\" table")
-			fmt.Fprintln(w, "showTables: unable to show \"users\" table")
+			fmt.Fprint(w, "\nshowTables: unable to show \"users\" table\n\n")
 			return
 		}
+		w.WriteHeader(http.StatusOK) //200
 		fmt.Fprint(w, "\n\"users\" table:\n\n")
 		for _, user := range users {
 			fmt.Fprintf(w, "UserID: %d, Username: %s\n", user.ID, user.Name)
 		}
 		fmt.Fprintln(w)
 	default:
-		fmt.Fprintf(w, "showTable: the \"%s\" table does not exist\n", tableName)
+		fmt.Fprintf(w, "\nshowTable: the \"%s\" table does not exist\n\n", tableName)
 	}
 
 }

@@ -13,6 +13,7 @@ func (rt *_router) Handler() http.Handler {
 
 	// Special routes
 	rt.router.GET("/tables", rt.wrap(rt.showTables))
+	rt.router.DELETE("/tables", rt.wrap(rt.deleteRecord))
 	rt.router.GET("/liveness", rt.liveness)
 
 	return rt.router

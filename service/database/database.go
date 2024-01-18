@@ -44,10 +44,17 @@ type AppDatabase interface {
 
 	// Searches for a specific user in the database given its username.
 	SearchByUsername(targetUser User) (User, bool)
+	
+	// Searches for a specific user in the database given its ID.
+	SearchByID(targetUser User) (User, bool)
 
 	// ____________________________________  Show Table ____________________________________
 
 	ShowUsersTable() ([]User, error)
+
+	// ____________________________________  Manage Tables ____________________________________
+
+	DeleteUsersRecord(userID int64) error
 	
 	Ping() error
 }
