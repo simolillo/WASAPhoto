@@ -1,4 +1,10 @@
 /*
+The database can be found here:
+/private/tmp/decaf.db
+open /tmp
+*/
+
+/*
 Package database is the middleware between the app database and the code. All data (de)serialization (save/load) from a
 persistent database are handled here. Database specific logic should never escape this package.
 
