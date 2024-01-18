@@ -33,18 +33,3 @@ func (db *appdbimpl) SearchByUsername(targetUser User) (selectedUser User, prese
 	present = true
 	return
 }
-
-// This function searches for a specific user in the database given its user ID.
-// It retruns the user if present and a boolean.
-func (db *appdbimpl) SearchByID(targetUser User) (selectedUser User, present bool) {
-	err := db.c.QueryRow("SELECT * FROM users WHERE UserID = ?;", targetUser.ID).Scan(&selectedUser.ID, &selectedUser.Name)
-
-	// if the query selects no rows
-	if err == sql.ErrNoRows {
-		present = false
-		return
-	}
-
-	present = true
-	return
-}

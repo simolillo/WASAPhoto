@@ -12,8 +12,6 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.POST("/session", rt.wrap(rt.doLogin))
 
 	// Special routes
-	rt.router.GET("/tables", rt.wrap(rt.showTables))
-	rt.router.DELETE("/tables", rt.wrap(rt.deleteRecord))
 	rt.router.GET("/liveness", rt.liveness)
 
 	return rt.router
