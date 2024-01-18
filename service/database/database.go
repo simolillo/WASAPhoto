@@ -46,10 +46,16 @@ import (
 type AppDatabase interface {
 	
 	// Creates a new user in the database.
-	CreateUser(User) (User, error)
+	CreateUser(username string) (User, error)
 
 	// Searches for a specific user in the database given its username.
-	SearchByUsername(targetUser User) (User, bool)
+	SearchByUsername(targetUsername string) (selectedUser User, present bool)
+
+	// Searches for a specific user in the database given its user ID.
+	SearchByID(targetUserID int64) (selectedUser User, present bool)
+
+	// Updates the username of a specific user in the database.
+	UpdateUsername(userID int64, newUsername string) (User, error)
 
 	Ping() error
 }

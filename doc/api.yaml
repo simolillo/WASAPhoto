@@ -32,13 +32,13 @@ info:
 
 tags:
   - name: browsing
-    description: All operations realted to users browsing.
+    description: All operations realated to users browsing.
   - name: user
-    description: All operations realted to users managing theri own profile.
+    description: All operations realated to users managing their own profile.
   - name: photo
     description: All operations related to users interacting with a photo.
   - name: login
-    description: All operations realted to users logging in.
+    description: All operations related to users logging in.
 
 
 components:
@@ -190,11 +190,11 @@ components:
     
     Unauthorized:
       # 401
-      description: The client must authenticate itself to get the requested response.
+      description: The client must authenticate him/herself in order for his/her request to be completed.
     
     Forbidden:
       # 403
-      description: |
+      description: |-
         The server understands the request but refuses to authorize it due to one or many of the following possibilities:
 
         1. the user is trying to act on somebody else's account or
@@ -207,6 +207,11 @@ components:
         3. different from the one of the account liking or commenting.
 
         Or simply the user is in the "banned" list of some other user hence is unable to see his profile nor photos.
+      
+    InternalServerError:
+      #500
+      description: "Server error."
+
 
   securitySchemes:
     bearerAuth:
@@ -227,12 +232,9 @@ paths:
     put:
       operationId: setMyUserName
       tags: [user]
-      summary: set personal username
-      description: >
-        Set personal username with the string provided in the request body.
-
-        The operation is allowed if and only if
-        it is the owner of the account to do it.
+      summary: update personal username
+      description: |-
+        Update personal username with the string provided in the request body.
       requestBody:
         content:
           application/json:
@@ -241,23 +243,34 @@ paths:
       responses:
         "200":
           # OK
-          description: |
-            Username successfully updated;
-            it is returned in the content.
+          description: |-
+            Username successfully updated.
+            The updated user is returned in the content.
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Username' }
+              schema: { $ref: '#/components/schemas/User' }
         "400":
           # Bad Request
-          description: >
-            The new username is missing from the request body or,
-            the new username is not matching the required string pattern.
+          description: |-
+            The {uid} path parameter
+              - is not a parseable int64 or is missing or;
+              - is not matching any existing user or;
+            the Authorization header ID
+              - is not matching any existing user or;
+            the request body is not a parseable JSON or is missing or;
+            the new username is not valid:
+              - the client has entered white spaces only or;
+              - the username is not matching the required string pattern or;
+              - the username hasn't got the required length.
         "401":
           # Unauthorized
           $ref: '#/components/responses/Unauthorized'
         "403":
           # Forbidden
           $ref: '#/components/responses/Forbidden'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
 
 
   /users/{uid}/photos/:
@@ -763,9 +776,10 @@ paths:
           # Bad Request
           description: |-
             The request body is not a parseable JSON or is missing or;
-            the client has entered white spaces only or;
-            the username is not matching the required string pattern or;
-            the username hasn't got the required length.
+            the username is not valid:
+              - the client has entered white spaces only or;
+              - the username is not matching the required string pattern or;
+              - the username hasn't got the required length.
         "500":
           # Internal Server Error
-          description: "Server error."
+          $ref: '#/components/responses/InternalServerError'

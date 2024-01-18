@@ -2,23 +2,27 @@ package api
 
 /*
 go run ./cmd/webapi/
-curl -v -H 'Content-Type: application/json' -d '{"username": "Lillo"}' localhost:3000/session
+curl -v \
+	-X POST \
+	-H 'Content-Type: application/json' \
+	-d '{"username": "Andrè"}' \
+	localhost:3000/session
 */
 
 /*
 Possible outcomes:
 
-1. checking if decoding operation ended successfully
-   curl -v -H 'Content-Type: application/json' -d '{"username": "Lillo}' localhost:3000/session
+1. checking if decoding operation of username ended successfully
+   curl -v -X POST -H 'Content-Type: application/json' -d '{"username": "Lillo}' localhost:3000/session
    (the JSON data is missing a closing quote resulting in an invalid JSON structure)
 
 2. checking if the username is valid
-   a. curl -v -H 'Content-Type: application/json' -d '{"username": "     "}' localhost:3000/session
+   a. curl -v -X POST -H 'Content-Type: application/json' -d '{"username": "     "}' localhost:3000/session
       (the client has enterd white spaces only, hence the username is not valid)
 
    b. (username doesn't match string pattern: '^.*?$': it contains a new line)
 
-   c. curl -v -H 'Content-Type: application/json' -d '{"username": "ab"}' localhost:3000/session
+   c. curl -v -X POST -H 'Content-Type: application/json' -d '{"username": "ab"}' localhost:3000/session
       (username hasn't got required length: is <3 or >16)
 
 3. if the user altready exists, return the ID
@@ -59,22 +63,23 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	w.Header().Set("Content-Type", "application/json")
 
 	// extracting username from the request
-	var user User
-	err := json.NewDecoder(r.Body).Decode(&user)
+	var auxUser User
+	err := json.NewDecoder(r.Body).Decode(&auxUser)
+	username := auxUser.Name
 
 	// 1.
-	// checking if decoding operation ended successfully
+	// checking if decoding operation of username ended successfully
 	if err != nil {
-		// the request body was not a parseable JSON or is missing, rejecting the request
+		// the request body (the username) was not a parseable JSON or is missing, rejecting the request
 		w.WriteHeader(http.StatusBadRequest) //400
-		ctx.Logger.WithError(err).Error("doLogin: the request body was not a parseable JSON or is missing")
-		fmt.Fprint(w, "\ndoLogin: the request body was not a parseable JSON or is missing\n\n")
+		ctx.Logger.WithError(err).Error("doLogin: the request body (the username) was not a parseable JSON or is missing")
+		fmt.Fprint(w, "\ndoLogin: the request body (the username) was not a parseable JSON or is missing\n\n")
 		return
 	}
 
 	// 2.
 	// checking if the username is valid
-	if !isValid(user.Name) {
+	if !isValid(username) {
 		// the username is not valid, rejecting request
 		w.WriteHeader(http.StatusBadRequest) //400
 		ctx.Logger.WithError(err).Error("doLogin: the username is not valid")
@@ -84,7 +89,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	// moving on to the database section
 	// first of all we search the user to see if it has alredy been created
-	selectedUser, present := rt.db.SearchByUsername(user.ToDatabase())
+	selectedUser, present := rt.db.SearchByUsername(username)
 
 	// 3.
 	// if the user already exists, return the ID
@@ -97,7 +102,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError) //500
 			ctx.Logger.WithError(err).Error("doLogin: unable to encode JSON response though the user is present")
-			fmt.Fprint(w, "doLogin: unable to encode JSON response though the user is present\n\n")
+			fmt.Fprint(w, "\ndoLogin: unable to encode JSON response though the user is present\n\n")
 			return
 		}
 
@@ -108,14 +113,14 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	// 5.
 	// if the user doesn't exist yet, create it and return the ID
-	createdUser, err := rt.db.CreateUser(user.ToDatabase())
+	createdUser, err := rt.db.CreateUser(username)
 
 	// 6.
 	// if user creation or ID retrieval is unsuccessful
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError) //500
-		ctx.Logger.WithError(err).Error("doLogin: user creation or ID retrieval is unsuccessful")
-		fmt.Fprint(w, "\ndoLogin: user creation or ID retrieval is unsuccessful\n\n")
+		ctx.Logger.WithError(err).Error("doLogin: user creation or ID retrieval was unsuccessful")
+		fmt.Fprint(w, "\ndoLogin: user creation or ID retrieval was unsuccessful\n\n")
 		return
 	}
 
@@ -127,7 +132,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError) //500
 		ctx.Logger.WithError(err).Error("doLogin: unable to encode JSON response though the user has been created")
-		fmt.Fprint(w, "doLogin: unable to encode JSON response though the user has been created\n\n")
+		fmt.Fprint(w, "\ndoLogin: unable to encode JSON response though the user has been created\n\n")
 		return
 	}
 
