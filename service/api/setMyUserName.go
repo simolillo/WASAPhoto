@@ -4,52 +4,52 @@ package api
 go run ./cmd/webapi/
 curl -v \
 	-X PUT \
-	-H 'Content-Type: application/json' \
+	-H 'Content-Type: text/plain' \
 	-H 'Authorization: 1' \
-	-d '{"username": "Lillino"}' \
+	-d "Lillino" \
 	localhost:3000/users/{1}/username
 */
 
 /*
 suppose user: 3 Anna
-curl -v	-X POST	-H 'Content-Type: application/json'	-d '{"username": "Anna"}' localhost:3000/session
+curl -v	-X POST	-H 'Content-Type: text/plain' -d "Anna" localhost:3000/session
 
 Possible outcomes:
 
 1. checking if the request is valid
-   a. curl -v -X PUT -H 'Content-Type: application/json' -H 'Authorization: 3' -d '{"username": "Fabia"}' localhost:3000/users/{aaa}/username
+   a. curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "Fabia" localhost:3000/users/{aaa}/username
       (the path parameter {uid} is not a parseable int64)
 
-   b. curl -v -X PUT -H 'Content-Type: application/json' -H 'Authorization: 3' -d '{"username": "Fabia}' localhost:3000/users/{1000}/username
+   b. curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "Fabia" localhost:3000/users/{1000}/username
       (the {uid} path parameter is not matching any existing user)
 
 2. authentication phase
-   a. curl -v -X PUT -H 'Content-Type: application/json' -d '{"username": "Fabia"}' localhost:3000/users/{3}/username
+   a. curl -v -X PUT -H 'Content-Type: text/plain' -d "Fabia" localhost:3000/users/{3}/username
       (the Authorization header is not present or no value is specified)
 
-   b. curl -v -X PUT -H 'Content-Type: application/json' -H 'Authorization: 1000' -d '{"username": "Fabia"}' localhost:3000/users/{3}/username
+   b. curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 1000' -d "Fabia" localhost:3000/users/{3}/username
       (the Authorization ID is not matching any existing user)
 
 3. authorization phase
-   curl -v -X PUT -H 'Content-Type: application/json' -H 'Authorization: 1' -d '{"username": "Fabia"}' localhost:3000/users/{3}/username
+   curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 1' -d "Fabia" localhost:3000/users/{3}/username
    (the ID of the user attempting the request is different from the one he wants to update the username of)
 
 4. checking if decoding operation of username ended successfully
-   curl -v -X PUT -H 'Content-Type: application/json' -H 'Authorization: 3' -d '{"username": "Fabia}' localhost:3000/users/{3}/username
-   (the JSON data is missing a closing double-quote resulting in an invalid JSON structure)
+   curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "Fabia localhost:3000/users/{3}/username
+   (the text/plain data is missing a closing double-quote resulting in an invalid text/plain)
 
 5. checking if the new username is valid
-   a. curl -v -X PUT -H 'Content-Type: application/json' -H 'Authorization: 3' -d '{"username": "     "}' localhost:3000/users/{3}/username
+   a. curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "     " localhost:3000/users/{3}/username
       (the client has enterd white spaces only, hence the username is not valid)
 
    b. (username doesn't match string pattern: '^.*?$': it contains a new line)
 
-   c. curl -v -X PUT -H 'Content-Type: application/json' -H 'Authorization: 3' -d '{"username": "Fa"}' localhost:3000/users/{3}/username
+   c. curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "Fa" localhost:3000/users/{3}/username
       (username hasn't got required length: is <3 or >16)
 
 6. updating the username
-   curl -v -X PUT -H 'Content-Type: application/json' -H 'Authorization: 3' -d '{"username": "Fabia"}' localhost:3000/users/{3}/username
-   curl -v -X PUT -H 'Content-Type: application/json' -H 'Authorization: 3' -d '{"username": "Anna"}' localhost:3000/users/{3}/username
+   curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "Fabia" localhost:3000/users/{3}/username
+   curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "Anna" localhost:3000/users/{3}/username
 
 	7. if oldUsername = newUsername
 	   (update same username twice)
@@ -62,12 +62,14 @@ Possible outcomes:
 */
 
 import (
-	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
-	"github.com/julienschmidt/httprouter"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"strconv"
-	"fmt"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 )
 
 /*
@@ -136,17 +138,16 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	// extracting username from the request
-	var auxUser User
-	err = json.NewDecoder(r.Body).Decode(&auxUser)
-	newUsername := auxUser.Name
+	body, err := io.ReadAll(r.Body)
+	newUsername := string(body)
 
 	// 4.
 	// checking if decoding operation of username ended successfully
 	if err != nil {
-		// the request body (the username) was not a parseable JSON or is missing, rejecting the request
+		// the request body (the username) was not a valid text/plain or is missing, rejecting the request
 		w.WriteHeader(http.StatusBadRequest) //400
-		ctx.Logger.WithError(err).Error("setMyUserName: the request body (the username) was not a parseable JSON or is missing")
-		fmt.Fprint(w, "\nsetMyUserName: the request body (the username) was not a parseable JSON or is missing\n\n")
+		ctx.Logger.WithError(err).Error("setMyUserName: the request body (the username) was not a valid text/plain or is missing")
+		fmt.Fprint(w, "\nsetMyUserName: the request body (the username) was not a valid text/plain or is missing\n\n")
 		return
 	}
 

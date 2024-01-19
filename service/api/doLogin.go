@@ -4,8 +4,8 @@ package api
 go run ./cmd/webapi/
 curl -v \
 	-X POST \
-	-H 'Content-Type: application/json' \
-	-d '{"username": "Andrè"}' \
+	-H 'Content-Type: text/plain' \
+	-d "Lillo" \
 	localhost:3000/session
 */
 
@@ -13,16 +13,16 @@ curl -v \
 Possible outcomes:
 
 1. checking if decoding operation of username ended successfully
-   curl -v -X POST -H 'Content-Type: application/json' -d '{"username": "Lillo}' localhost:3000/session
-   (the JSON data is missing a closing quote resulting in an invalid JSON structure)
+   curl -v -X POST -H 'Content-Type: text/plain' -d "Lillo localhost:3000/session
+   (the text/plain data is missing a closing double-quote resulting in an invalid text/plain)
 
 2. checking if the username is valid
-   a. curl -v -X POST -H 'Content-Type: application/json' -d '{"username": "     "}' localhost:3000/session
+   a. curl -v -X POST -H 'Content-Type: text/plain' -d "     " localhost:3000/session
       (the client has enterd white spaces only, hence the username is not valid)
 
    b. (username doesn't match string pattern: '^.*?$': it contains a new line)
 
-   c. curl -v -X POST -H 'Content-Type: application/json' -d '{"username": "ab"}' localhost:3000/session
+   c. curl -v -X POST -H 'Content-Type: text/plain' -d "ab" localhost:3000/session
       (username hasn't got required length: is <3 or >16)
 
 3. if the user altready exists, return the ID
@@ -47,6 +47,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"fmt"
+	"io"
 )
 
 /*
@@ -63,17 +64,16 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	w.Header().Set("Content-Type", "application/json")
 
 	// extracting username from the request
-	var auxUser User
-	err := json.NewDecoder(r.Body).Decode(&auxUser)
-	username := auxUser.Name
+	body, err := io.ReadAll(r.Body)
+	username := string(body)
 
 	// 1.
 	// checking if decoding operation of username ended successfully
 	if err != nil {
-		// the request body (the username) was not a parseable JSON or is missing, rejecting the request
+		// the request body (the username) was not a valid text/plain or is missing, rejecting the request
 		w.WriteHeader(http.StatusBadRequest) //400
-		ctx.Logger.WithError(err).Error("doLogin: the request body (the username) was not a parseable JSON or is missing")
-		fmt.Fprint(w, "\ndoLogin: the request body (the username) was not a parseable JSON or is missing\n\n")
+		ctx.Logger.WithError(err).Error("doLogin: the request body (the username) was not a valid text/plain or is missing")
+		fmt.Fprint(w, "\ndoLogin: the request body (the username) was not a valid text/plain or is missing\n\n")
 		return
 	}
 

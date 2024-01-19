@@ -79,6 +79,9 @@ components:
           type: number
           format: int64
           example: 1
+    
+    #RawPhoto:
+
       
     Photo:
       description: This object represents a photo.
@@ -237,7 +240,7 @@ paths:
         Update personal username with the string provided in the request body.
       requestBody:
         content:
-          application/json:
+          text/plain:
             schema: { $ref: '#/components/schemas/Username' }
         required: true
       responses:
@@ -752,7 +755,7 @@ paths:
       requestBody:
         description: Username.
         content:
-          application/json:
+          text/plain:
             schema: { $ref: '#/components/schemas/Username' }
         required: true
       responses:
