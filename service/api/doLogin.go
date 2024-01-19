@@ -5,7 +5,7 @@ go run ./cmd/webapi/
 curl -v \
 	-X POST \
 	-H 'Content-Type: text/plain' \
-	-d "Lillo" \
+	-d "Giachi" \
 	localhost:3000/session
 */
 
@@ -42,12 +42,14 @@ Possible outcomes:
 */
 
 import (
-	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
-	"github.com/julienschmidt/httprouter"
 	"encoding/json"
-	"net/http"
 	"fmt"
 	"io"
+	"net/http"
+	"github.com/simolillo/WASAPhoto/service/fileSystem"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 )
 
 /*
@@ -124,6 +126,12 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
+	err = fs.CreateUserFolder(createdUser.ID, createdUser.Name)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("session/createUserFolder:: error creating directories for user")
+		return
+	}
+
 	fmt.Fprintln(w)
 	err = json.NewEncoder(w).Encode(createdUser)
 
@@ -140,3 +148,8 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	fmt.Fprint(w, "\nUser sign-up action successful.\nThe user ID has been created and is returned in the content.\n\n")
 
 }
+
+func createUserFolder(i int64, s string) {
+	panic("unimplemented")
+}
+

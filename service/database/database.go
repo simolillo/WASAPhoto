@@ -92,10 +92,17 @@ func (db *appdbimpl) Ping() error {
 
 // This function creates the entire structure of the database (tables and relations) through SQL statements.
 func createDatabase(db *sql.DB) error {
-	tables := [1]string{
+	tables := [2]string{
 		`CREATE TABLE IF NOT EXISTS users (
-			userID INTEGER NOT NULL PRIMARY KEY,
+			userID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			username VARCHAR(16) NOT NULL UNIQUE
+			);`,
+		`CREATE TABLE IF NOT EXISTS photos (
+			photoID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			authorID INTEGER NOT NULL,
+			path VARCHAR NOT NULL,
+			uploadDateTime DATETIME NOT NULL,
+			FOREIGN KEY (authorID) REFERENCES users(userID) ON DELETE CASCADE
 			);`,
 	}
 

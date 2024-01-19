@@ -5,9 +5,9 @@ go run ./cmd/webapi/
 curl -v \
 	-X PUT \
 	-H 'Content-Type: text/plain' \
-	-H 'Authorization: 1' \
-	-d "Lillino" \
-	localhost:3000/users/{1}/username
+	-H 'Authorization: 2' \
+	-d "BatMan" \
+	localhost:3000/users/{2}/username
 */
 
 /*
@@ -107,7 +107,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 
 	// extracting authorizationUid from the Authorization header
 	var authorizationUid int64
-	authorizationUid, err = strconv.ParseInt(r.Header.Get("Authorization"), 10, 64) 
+	authorizationUid, err = strconv.ParseInt(r.Header.Get("Authorization"), 10, 64)
 
 	// 2.
 	// authentication phase

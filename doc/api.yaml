@@ -21,7 +21,7 @@
 openapi: 3.0.0
 info:
   title: WASAPhoto
-  description: >
+  description: >-
     Keep in touch with your friends
     by sharing photos of special moments,
     thanks to WASAPhoto!
@@ -45,6 +45,13 @@ components:
 
   schemas:
 
+    UserID:
+      description: UserID.
+      readOnly: true
+      type: number
+      format: int64
+      example: 1
+
     Username:
       description: Username.
       type: string
@@ -53,35 +60,29 @@ components:
       minLength: 3
       maxLength: 16
 
-    UserID:
-      description: UserID.
+    User:
+      description: This object represents a user.
+      type: object
+      properties:
+        userID:
+          $ref: '#/components/schemas/UserID'
+        username:
+          $ref: '#/components/schemas/Username'
+
+    PhotoID:
+      description: PhotoID.
       readOnly: true
       type: number
       format: int64
       example: 1
 
-    User:
-      description: This object represents a user.
-      type: object
-      properties:
-        username:
-          $ref: '#/components/schemas/Username'
-        uid:
-          $ref: '#/components/schemas/UserID'
-
-    PhotoID:
-      description: Photo identifier.
-      type: object
-      properties:
-        photoID:
-          description: PhotoID.
-          readOnly: true
-          type: number
-          format: int64
-          example: 1
-    
-    #RawPhoto:
-
+    RawPhoto:
+      description: Photo file.
+      type: string
+      format: binary
+      example: '101010101'
+      minLength: 1
+      maxLength: 99999999999999999999      
       
     Photo:
       description: This object represents a photo.
@@ -294,11 +295,10 @@ paths:
         it is the owner of the account to do it.
       requestBody:
         content:
-          multipart/form-data:
-            schema: { $ref: '#/components/schemas/Photo' }
-            encoding:
-              photo:
-                contentType: image/png, image/jpeg
+          image/jpeg:
+            schema: { $ref: '#/components/schemas/RawPhoto' }
+          image/png:
+            schema: { $ref: '#/components/schemas/RawPhoto' }
         required: true
       responses:
         "201":

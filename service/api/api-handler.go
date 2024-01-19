@@ -15,6 +15,10 @@ func (rt *_router) Handler() http.Handler {
 	// User endpoint
 	// All operations realated to users managing their own profile.
 	rt.router.PUT("/users/:uid/username", rt.wrap(rt.setMyUserName))
+	
+	// Photo endpoint
+	// All operations realated to users managing their own profile.
+	rt.router.POST("/users/:uid/photos/", rt.wrap(rt.uploadPhoto))
 
 	// Special routes
 	rt.router.GET("/liveness", rt.liveness)
