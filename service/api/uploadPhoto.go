@@ -4,18 +4,26 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"image/jpeg"
-	"image/png"
+	"image"
+	
 	"io"
 
 	"net/http"
 	"strconv"
-	"time"
+
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 	"github.com/simolillo/WASAPhoto/service/fileSystem"
 )
+
+/*
+curl -v \
+	-X POST \
+	-H 'Authorization: 1' \
+	--data-binary "@/Users/simonerussolillo/Pictures/Portogallo.JPG" \
+	localhost:3000/users/{1}/photos/
+*/
 
 func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
@@ -26,6 +34,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	var pathUid int64
 	pathUid, err := strconv.ParseInt(ps.ByName("uid"), 10, 64)
 
+	
 	// 1.
 	// checking if the request is valid
 	if err != nil {
@@ -44,6 +53,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
+	
 	// extracting authorizationUid from the Authorization header
 	var authorizationUid int64
 	authorizationUid, err = strconv.ParseInt(r.Header.Get("Authorization"), 10, 64)
@@ -76,8 +86,19 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return		
 	}
 
+	var photo Photo
+	
+
+	imageFile, err := io.ReadAll(r.Body)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("photo-upload: error reading body content")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	reader := bytes.NewReader(imageFile)
+
 	// Legge il body della richiesta e verifica se ci sono errori durante la lettura.
-	data, err := io.ReadAll(r.Body)
+	_, format, err := image.DecodeConfig(reader)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("photo-upload: error reading body content")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -86,32 +107,29 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// Reimposta il body della richiesta in modo da poterlo leggere di nuovo in seguito
 	// Dopo aver letto il body bisogna riassegnare un io.ReadCloser per poterlo rileggere
-	r.Body = io.NopCloser(bytes.NewBuffer(data))
+	r.Body = io.NopCloser(bytes.NewBuffer(imageFile))
 
-	// verifico se il contenuto del body è una immagine png o jpeg(in caso di errore:400 badrequest)
-	imageFile, err := jpeg.Decode(r.Body)
-	format := "jpg"
-	if err != nil {
-		r.Body = io.NopCloser(bytes.NewBuffer(data))
-		imageFile, err = png.Decode(r.Body)
-		format = "png"
-		if err != nil {
-			return
-		}
+	
+	switch format {
+	case "jpeg":
+		
+	case "png":
+		
+	default:
+		ctx.Logger.WithError(err).Error("error format")
+		return 
 	}
+	
 
-
-
+	
 	path := fs.UserFolderName(selectedUser1.ID, selectedUser1.Name)
 
 	// extracting uploadDateTime from the Date header
-	uploadDateTime, err := time.Parse(http.TimeFormat, r.Header.Get("Date"))
-	if err != nil {
-		return
-	}
-	photo := Photo{AuthorID: selectedUser1.ID, Path: path, Format: format, UploadDateTime: uploadDateTime}
+	uploadDateTime := r.Header.Get("Date")
+	photo = Photo{AuthorID: selectedUser1.ID, Path: path, Format: format, UploadDateTime: uploadDateTime}
 
 
+	fmt.Fprintln(w, "qui")
 	createdPhoto, err := rt.db.CreatePhoto(photo.ToDatabase())
 
 	// 6.
@@ -143,5 +161,5 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusFailedDependency)
 }

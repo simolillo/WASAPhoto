@@ -1,6 +1,6 @@
 package database
 
-import "time"
+
 
 type User struct {
 	ID int64    `json:"userID"`
@@ -12,5 +12,5 @@ type Photo struct {
 	AuthorID int64           `json:"authorID"`
 	Path string              `json:"path"`
 	Format string            `json:"format"`
-	UploadDateTime time.Time `json:"uploadDateTime"`
+	UploadDateTime string    `json:"uploadDateTime"`
 }

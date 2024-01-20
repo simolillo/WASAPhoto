@@ -66,7 +66,7 @@ func moveFiles(oldPath, newPath string) error {
 }
 
 // Funzione per creare una nuova photo file
-func CreatePhotoFile(photo Photo, imageFile image.Image) error {
+func CreatePhotoFile(photo Photo, imageFile []bytes) error {
 
 	createdFile, err := os.Create(photo.Path)
 	if err != nil {
