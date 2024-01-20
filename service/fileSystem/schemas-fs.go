@@ -1,6 +1,7 @@
-package database
+package fs
 
 import "time"
+
 
 type User struct {
 	ID int64    `json:"userID"`

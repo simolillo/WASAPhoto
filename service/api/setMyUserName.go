@@ -5,9 +5,9 @@ go run ./cmd/webapi/
 curl -v \
 	-X PUT \
 	-H 'Content-Type: text/plain' \
-	-H 'Authorization: 2' \
-	-d "BatMan" \
-	localhost:3000/users/{2}/username
+	-H 'Authorization: 1' \
+	-d "Lillo" \
+	localhost:3000/users/{1}/username
 */
 
 /*
@@ -69,6 +69,7 @@ import (
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/simolillo/WASAPhoto/service/fileSystem"
 	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 )
 
@@ -185,6 +186,13 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 		ctx.Logger.WithError(err).Error("setMyUserName: user update was unsuccessful")
 		fmt.Fprint(w, "\nsetMyUserName: user update was unsuccessful\n\n")
 		return
+	}
+
+	// update User folder name
+	err = fs.UpdateUserFolderName(userID, oldUsername, newUsername)
+	if err != nil {
+		fmt.Fprintln(w, "vamos")
+		return 
 	}
 
 	fmt.Fprintln(w)

@@ -5,7 +5,7 @@ go run ./cmd/webapi/
 curl -v \
 	-X POST \
 	-H 'Content-Type: text/plain' \
-	-d "Giachi" \
+	-d "Lillo" \
 	localhost:3000/session
 */
 
@@ -147,9 +147,5 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	w.WriteHeader(http.StatusCreated) //201
 	fmt.Fprint(w, "\nUser sign-up action successful.\nThe user ID has been created and is returned in the content.\n\n")
 
-}
-
-func createUserFolder(i int64, s string) {
-	panic("unimplemented")
 }
 

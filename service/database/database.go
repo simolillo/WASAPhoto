@@ -57,6 +57,9 @@ type AppDatabase interface {
 	// Updates the username of a specific user in the database.
 	UpdateUsername(userID int64, newUsername string) (User, error)
 
+	// Creates a new photo in the database.
+	CreatePhoto(photo Photo) (Photo, error)
+
 	Ping() error
 }
 
@@ -100,7 +103,8 @@ func createDatabase(db *sql.DB) error {
 		`CREATE TABLE IF NOT EXISTS photos (
 			photoID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			authorID INTEGER NOT NULL,
-			path VARCHAR NOT NULL,
+			path VARCHAR,
+			format VARCHAR(3) NOT NULL,
 			uploadDateTime DATETIME NOT NULL,
 			FOREIGN KEY (authorID) REFERENCES users(userID) ON DELETE CASCADE
 			);`,

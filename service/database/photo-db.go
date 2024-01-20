@@ -10,7 +10,7 @@ import (
 func (db *appdbimpl) CreatePhoto(photo Photo) (Photo, error) {
 
 	// since photoID value is not specified, SQLite automatically assigns the next sequential integer
-	sqlResult, err := db.c.Exec("INSERT INTO photos (authorID, uploadDateTime) VALUES (?,?)", photo.AuthorID, photo.UploadDateTime)
+	sqlResult, err := db.c.Exec("INSERT INTO photos (authorID, format, uploadDateTime) VALUES (?,?,?)", photo.AuthorID, photo.Format, photo.UploadDateTime)
 
 	if err != nil {
 		return photo, err
@@ -21,7 +21,7 @@ func (db *appdbimpl) CreatePhoto(photo Photo) (Photo, error) {
 	if err != nil {
 		return photo, err
 	}
-	photo.Path = filepath.Join(photo.Path + fmt.Sprint(photo.ID))
+	photo.Path = filepath.Join(photo.Path + fmt.Sprint(photo.ID) + photo.Format)
 	
 	_, err = db.c.Exec("UPDATE photos SET path = ? WHERE photoID = ?", photo.Path, photo.ID)
 
