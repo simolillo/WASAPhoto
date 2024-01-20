@@ -82,7 +82,7 @@ components:
       format: binary
       example: '101010101'
       minLength: 1
-      maxLength: 99999999999999999999      
+      maxLength: 999      
       
     Photo:
       description: This object represents a photo.
@@ -102,7 +102,7 @@ components:
           type: string
           format: binary
           minLength: 1
-          maxLength: 99999999999999999999
+          maxLength: 999
 
     CommentID:
       description: Comment identifier.
