@@ -97,14 +97,14 @@ func (db *appdbimpl) Ping() error {
 func createDatabase(db *sql.DB) error {
 	tables := [2]string{
 		`CREATE TABLE IF NOT EXISTS users (
-			userID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			userID INTEGER NOT NULL PRIMARY KEY,
 			username VARCHAR(16) NOT NULL UNIQUE
 			);`,
 		`CREATE TABLE IF NOT EXISTS photos (
-			photoID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			photoID INTEGER NOT NULL PRIMARY KEY,
 			authorID INTEGER NOT NULL,
 			path VARCHAR,
-			format VARCHAR(3) NOT NULL,
+			format VARCHAR(4) NOT NULL,
 			uploadDateTime DATETIME NOT NULL,
 			FOREIGN KEY (authorID) REFERENCES users(userID) ON DELETE CASCADE
 			);`,

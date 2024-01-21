@@ -56,7 +56,6 @@ func (db *appdbimpl) SearchByID(targetUserID int64) (selectedUser User, present 
 // This function updates the username of the specified user.
 // It returns the updated user and possibly an error.
 func (db *appdbimpl) UpdateUsername(userID int64, newUsername string) (User, error) {
-	user := User{userID, newUsername}
 	_, err := db.c.Exec("UPDATE users SET username = ? WHERE userID = ?", newUsername, userID)
-	return user, err
+	return User{userID, newUsername}, err
 }

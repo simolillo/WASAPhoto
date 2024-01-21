@@ -6,7 +6,7 @@ curl -v \
 	-X PUT \
 	-H 'Content-Type: text/plain' \
 	-H 'Authorization: 1' \
-	-d "Lillo" \
+	-d "Lilla" \
 	localhost:3000/users/{1}/username
 */
 
@@ -16,61 +16,67 @@ curl -v	-X POST	-H 'Content-Type: text/plain' -d "Anna" localhost:3000/session
 
 Possible outcomes:
 
-1. checking if the request is valid
-   a. curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "Fabia" localhost:3000/users/{aaa}/username
+1. checking if the request is valid                                                                     400 BadRequest
+   a. curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "Fabia" \
+      localhost:3000/users/{aaa}/username
       (the path parameter {uid} is not a parseable int64)
 
-   b. curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "Fabia" localhost:3000/users/{1000}/username
+   b. curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "Fabia" \
+      localhost:3000/users/{1000}/username
       (the {uid} path parameter is not matching any existing user)
 
 2. authentication phase
-   a. curl -v -X PUT -H 'Content-Type: text/plain' -d "Fabia" localhost:3000/users/{3}/username
+   a. curl -v -X PUT -H 'Content-Type: text/plain' -d "Fabia" \                                         401 Unauthorized
+      localhost:3000/users/{3}/username
       (the Authorization header is not present or no value is specified)
 
-   b. curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 1000' -d "Fabia" localhost:3000/users/{3}/username
+   b. curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 1000' -d "Fabia" \                400 BadRequest
+      localhost:3000/users/{3}/username
       (the Authorization ID is not matching any existing user)
 
-3. authorization phase
-   curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 1' -d "Fabia" localhost:3000/users/{3}/username
-   (the ID of the user attempting the request is different from the one he wants to update the username of)
+3. authorization phase                                                                                  403 Forbidden
+   curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 1' -d "Fabia" \
+   localhost:3000/users/{3}/username
+   (the {uid} path parameter is different from the Authorization ID)
 
-4. checking if decoding operation of username ended successfully
-   curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "Fabia localhost:3000/users/{3}/username
-   (the text/plain data is missing a closing double-quote resulting in an invalid text/plain)
+4. checking if decoding operation of username ended successfully                                        500 InternalServerError
+   (server error)
 
-5. checking if the new username is valid
-   a. curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "     " localhost:3000/users/{3}/username
+5. checking if the new username is valid                                                                400 BadRequest
+   a. curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "     " \
+      localhost:3000/users/{3}/username
       (the client has enterd white spaces only, hence the username is not valid)
 
    b. (username doesn't match string pattern: '^.*?$': it contains a new line)
 
-   c. curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "Fa" localhost:3000/users/{3}/username
+   c. curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "Fa" \
+      localhost:3000/users/{3}/username
       (username hasn't got required length: is <3 or >16)
 
-6. updating the username
-   curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "Fabia" localhost:3000/users/{3}/username
-   curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "Anna" localhost:3000/users/{3}/username
+6. updating the username                                                                                200 OK
+   curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "Fabia" \
+   localhost:3000/users/{3}/username
+   curl -v -X PUT -H 'Content-Type: text/plain' -H 'Authorization: 3' -d "Anna" \
+   localhost:3000/users/{3}/username
 
-	7. if oldUsername = newUsername
+	7. if oldUsername = newUsername                                                                     200 OK
 	   (update same username twice)
 
-	8. if user update is unsuccessful
+	8. if user update is unsuccessful                                                                   500 InternalServerError
 	   (server error)
 
-	9. if encoding operation is unsuccessful though the user has been updated
+	9. if encoding operation is unsuccessful though the user has been updated                           500 InternalServerError
 	   (server error)
 */
 
 import (
+	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
+	"github.com/julienschmidt/httprouter"
 	"encoding/json"
-	"fmt"
-	"io"
 	"net/http"
 	"strconv"
-
-	"github.com/julienschmidt/httprouter"
-	"github.com/simolillo/WASAPhoto/service/fileSystem"
-	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
+	"fmt"
+	"io"
 )
 
 /*
@@ -138,17 +144,19 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 		return		
 	}
 
-	// extracting username from the request
+	// the user is both authenticated and authorized
+	requestingUser := selectedUser1
+
+	// extracting username from the request body
 	body, err := io.ReadAll(r.Body)
 	newUsername := string(body)
 
 	// 4.
 	// checking if decoding operation of username ended successfully
 	if err != nil {
-		// the request body (the username) was not a valid text/plain or is missing, rejecting the request
-		w.WriteHeader(http.StatusBadRequest) //400
-		ctx.Logger.WithError(err).Error("setMyUserName: the request body (the username) was not a valid text/plain or is missing")
-		fmt.Fprint(w, "\nsetMyUserName: the request body (the username) was not a valid text/plain or is missing\n\n")
+		w.WriteHeader(http.StatusInternalServerError) //500
+		ctx.Logger.WithError(err).Error("setMyUserName: error extracting the username from the request body")
+		fmt.Fprint(w, "\nsetMyUserName: error extracting the username from the request body\n\n")
 		return
 	}
 
@@ -166,48 +174,41 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 
 	// 6.
 	// updating the username
-	userID := selectedUser1.ID
-	oldUsername := selectedUser1.Name
+	userID := requestingUser.ID
+	oldUsername := requestingUser.Name
 
 	// 7.
 	// if oldUsername = newUsername
 	if oldUsername == newUsername {
 		w.WriteHeader(http.StatusOK) //200
-		fmt.Fprint(w, "\nUsername already updated: ", oldUsername, ".\nNo need to change it.\n\n")
+		fmt.Fprintf(w, "\nsetMyUserName:\nUsername already updated: %s.\nNo need to change it.\n\n", oldUsername)
 		return
 	}
 
 	updatedUser, err := rt.db.UpdateUsername(userID, newUsername)
 
 	// 8.
-	// if user update is unsuccessful
+	// if username update is unsuccessful
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError) //500
-		ctx.Logger.WithError(err).Error("setMyUserName: user update was unsuccessful")
-		fmt.Fprint(w, "\nsetMyUserName: user update was unsuccessful\n\n")
-		return
-	}
-
-	// update User folder name
-	err = fs.UpdateUserFolderName(userID, oldUsername, newUsername)
-	if err != nil {
-		fmt.Fprintln(w, "vamos")
-		return 
-	}
-
-	fmt.Fprintln(w)
-	err = json.NewEncoder(w).Encode(updatedUser)
-
-	// 9.
-	// if encoding operation is unsuccessful though the user has been updated
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError) //500
-		ctx.Logger.WithError(err).Error("setMyUserName: unable to encode JSON response though the user has been updated")
-		fmt.Fprint(w, "\nsetMyUserName: unable to encode JSON response though the user has been updated\n\n")
+		ctx.Logger.WithError(err).Error("setMyUserName: username update was unsuccessful")
+		fmt.Fprint(w, "\nsetMyUserName: username update was unsuccessful\n\n")
 		return
 	}
 
 	w.WriteHeader(http.StatusOK) //200
-	fmt.Fprint(w, "\nUsername successfully updated.\nThe updated user is returned in the content.\n\n")
+	fmt.Fprintln(w)
+	err = json.NewEncoder(w).Encode(updatedUser)
+
+	// 9.
+	// if encoding operation is unsuccessful though the username has been updated
+	if err != nil {
+		http.Error(w, "StatusInternalServerError", http.StatusInternalServerError) //500
+		ctx.Logger.WithError(err).Error("setMyUserName: unable to encode JSON response though the username has been updated")
+		fmt.Fprint(w, "\nsetMyUserName: unable to encode JSON response though the username has been updated\n\n")
+		return
+	}
+
+	fmt.Fprint(w, "\nsetMyUserName:\nUsername successfully updated.\nThe updated user is returned in the content.\n\n")
 
 }

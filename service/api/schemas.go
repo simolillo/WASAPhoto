@@ -1,7 +1,7 @@
 package api
 
 import (
-	
+	"time"
 
 	"github.com/simolillo/WASAPhoto/service/database"
 	"github.com/simolillo/WASAPhoto/service/fileSystem"
@@ -17,7 +17,7 @@ type Photo struct {
 	AuthorID int64           `json:"authorID"`
 	Path string              `json:"path"`
 	Format string            `json:"format"`
-	UploadDateTime string    `json:"uploadDateTime"`
+	UploadDateTime time.Time    `json:"uploadDateTime"`
 }
 
 // _________________ DB-Conversion Methods _________________
