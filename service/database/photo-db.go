@@ -1,8 +1,10 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
 	"path/filepath"
+
 	"github.com/simolillo/WASAPhoto/service/fileSystem"
 )
 
@@ -28,6 +30,26 @@ func (db *appdbimpl) CreatePhoto(photo Photo) (Photo, error) {
 
 func (db *appdbimpl) GetFromDatabase(photoID int64) (Photo, error) {
 	var photo Photo
-	err := db.c.QueryRow("SELECT * FROM photos WHERE photoID = ?;", photoID).Scan(&photo)
+	err := db.c.QueryRow("SELECT * FROM photos WHERE photoID = ?;", photoID).Scan(&photo.ID, &photo.AuthorID, &photo.Path, &photo.Format, &photo.UploadDateTime)
 	return photo, err
+}
+
+// This function searches for a specific photo in the database given its photo ID.
+// It retruns the user if present and a boolean.
+func (db *appdbimpl) SearchPByID(targetPhotoID int64) (selectedPhoto Photo, present bool) {
+	err := db.c.QueryRow("SELECT * FROM photos WHERE photoID = ?;", targetPhotoID).Scan(&selectedPhoto.ID, &selectedPhoto.AuthorID, &selectedPhoto.Path, &selectedPhoto.Format, &selectedPhoto.UploadDateTime)
+
+	// if the query selects no rows
+	if err == sql.ErrNoRows {
+		present = false
+		return
+	}
+
+	present = true
+	return
+}
+
+func (db *appdbimpl) LikePhoto(photoID int64, userID int64) error {
+	_, err := db.c.Exec("INSERT INTO likes (photoID, userID) VALUES (?,?)", photoID, userID)
+	return err
 }

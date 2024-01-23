@@ -44,10 +44,10 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	
+
 	// Creates a new user in the database.
 	CreateUser(username string) (User, error)
-	
+
 	// Follow a user.
 	FollowUser(followerID int64, followedID int64) error
 
@@ -63,17 +63,25 @@ type AppDatabase interface {
 	// Get photo from database
 	GetFromDatabase(photoID int64) (Photo, error)
 
+	// Get user profile info
+	GetUserProfile(userID int64, viewerID int64) (Profile, error)
+
 	// Searches for a specific user in the database given its username.
 	SearchByUsername(targetUsername string) (selectedUser User, present bool)
 
 	// Checks follow
 	CheckFollow(userID1 int64, userID2 int64) (following bool)
 
+	// Put like to photo
+	LikePhoto(photoID int64, userID int64) error
+
 	// Checks ban
 	CheckBan(userID1 int64, userID2 int64) (banned bool)
 
 	// Searches for a specific user in the database given its user ID.
-	SearchByID(targetUserID int64) (selectedUser User, present bool)
+	SearchUByID(targetUserID int64) (selectedUser User, present bool)
+
+	SearchPByID(targetPhotoID int64) (selectedPhoto Photo, present bool)
 
 	// Updates the username of a specific user in the database.
 	UpdateUsername(userID int64, newUsername string) (User, error)
@@ -116,7 +124,7 @@ func (db *appdbimpl) Ping() error {
 
 // This function creates the entire structure of the database (tables and relations) through SQL statements.
 func createDatabase(db *sql.DB) error {
-	tables := [4]string{
+	tables := [5]string{
 		`CREATE TABLE IF NOT EXISTS users (
 			userID INTEGER NOT NULL PRIMARY KEY,
 			username VARCHAR(16) NOT NULL UNIQUE
@@ -140,8 +148,15 @@ func createDatabase(db *sql.DB) error {
 			bannerID INTEGER NOT NULL,
 			bannedID INTEGER NOT NULL,
 			PRIMARY KEY (bannerID, bannedID),
-			FOREIGN KEY (bannerID) REFERENCES users (userID) ON DELETE CASCADE,
-			FOREIGN KEY (bannedID) REFERENCES users (userID) ON DELETE CASCADE
+			FOREIGN KEY (bannerID) REFERENCES users(userID) ON DELETE CASCADE,
+			FOREIGN KEY (bannedID) REFERENCES users(userID) ON DELETE CASCADE
+			);`,
+		`CREATE TABLE IF NOT EXISTS likes (
+			photoID INTEGER NOT NULL,
+			userID INTEGER NOT NULL,
+			PRIMARY KEY (photoID, userID),
+			FOREIGN KEY (photoID) REFERENCES photos(photoID) ON DELETE CASCADE
+			FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE
 			);`,
 	}
 
@@ -149,11 +164,11 @@ func createDatabase(db *sql.DB) error {
 	for t := 0; t < len(tables); t++ {
 		sqlStmt := tables[t]
 		_, err := db.Exec(sqlStmt)
-		
+
 		if err != nil {
 			return err
 		}
 	}
 
 	return nil
-} 
+}

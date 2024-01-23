@@ -20,6 +20,14 @@ type Photo struct {
 	UploadDateTime time.Time    `json:"uploadDateTime"`
 }
 
+type Profile struct {
+	Username string                 `json:"username"`
+	Posts int64           `json:"posts"`
+	Followers int64              `json:"followers"`
+	Following int64            `json:"following"`
+	IsFollowedByViewer bool   `json:"isFollowedByViewer"`
+}
+
 // _________________ DB-Conversion Methods _________________
 
 func (user User) ToDatabase() database.User {

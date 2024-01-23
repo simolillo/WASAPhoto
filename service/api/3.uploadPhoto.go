@@ -5,9 +5,9 @@ go run ./cmd/webapi/
 curl -v \
 	-X POST \
 	-H 'Content-Type: image/*' \
-	-H 'Authorization: 1' \
+	-H 'Authorization: 2' \
 	--data-binary "@/Users/simonerussolillo/Pictures/Random/rainforest.png" \
-	localhost:3000/users/{1}/photos/
+	localhost:3000/photos/
 */
 
 /*
@@ -66,16 +66,17 @@ Possible outcomes:
 */
 
 import (
-	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
-	"github.com/simolillo/WASAPhoto/service/fileSystem"
-	"github.com/simolillo/WASAPhoto/service/database"
-	"github.com/julienschmidt/httprouter"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
-	"fmt"
-	"io"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
+	"github.com/simolillo/WASAPhoto/service/database"
+	fs "github.com/simolillo/WASAPhoto/service/fileSystem"
 )
 
 /*
@@ -92,33 +93,13 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// 1.
 	// checking if the request is valid
-	
-	// extracting {uid} parameter from the path
-	var pathUid int64
-	pathUid, err := strconv.ParseInt(ps.ByName("uid"), 10, 64)
 
-	if err != nil {
-		// the path parameter {uid} was not a parseable int64 or is missing, rejecting the request
-		w.WriteHeader(http.StatusBadRequest) //400
-		ctx.Logger.WithError(err).Error("uploadPhoto: the path parameter {uid} was not a parseable int64 or is missing")
-		fmt.Fprint(w, "\nuploadPhoto: the path parameter {uid} was not a parseable int64 or is missing\n\n")
-		return
-	}
-	selectedUser1, present := rt.db.SearchByID(pathUid)
-	if !present {
-		// the {uid} path parameter is not matching any existing user, rejecting the request
-		w.WriteHeader(http.StatusBadRequest) //400
-		ctx.Logger.WithError(err).Error("uploadPhoto: the path parameter {uid} is not matching any existing user")
-		fmt.Fprint(w, "\nuploadPhoto: the path parameter {uid} is not matching any existing user\n\n")
-		return
-	}
-	
 	// 2.
 	// authentication phase
-	
+
 	// extracting authorizationUid from the Authorization header
 	var authorizationUid int64
-	authorizationUid, err = strconv.ParseInt(r.Header.Get("Authorization"), 10, 64)
+	authorizationUid, err := strconv.ParseInt(r.Header.Get("Authorization"), 10, 64)
 
 	if err != nil {
 		// the Authorization header is not present or no value is specified, rejecting the request
@@ -127,7 +108,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		fmt.Fprint(w, "\nuploadPhoto: the user is not authenticated\n\n")
 		return
 	}
-	selectedUser2, present := rt.db.SearchByID(authorizationUid)
+	selectedUser, present := rt.db.SearchUByID(authorizationUid)
 	if !present {
 		// the Authorization ID is not matching any existing user, rejecting the request
 		w.WriteHeader(http.StatusBadRequest) //400
@@ -136,18 +117,8 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	// 3.
-	// authorization phase
-	if selectedUser1.ID != selectedUser2.ID {
-		// the ID of the user attempting the request is different from the one he wants to update the username of, rejecting the request
-		w.WriteHeader(http.StatusForbidden) //403
-		ctx.Logger.WithError(err).Error("uploadPhoto: the ID of the user attempting the request is different from the one he wants to update the username of")
-		fmt.Fprint(w, "\nuploadPhoto: the ID of the user attempting the request is different from the one he wants to update the username of\n\n")
-		return		
-	}
-
 	// the user is both authenticated and authorized
-	requestingUser := selectedUser1
+	requestingUser := selectedUser
 
 	// 4.
 	// extracting the binary data from the request body
@@ -177,7 +148,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// the binary data is an image of the supperted type (png/jpg)
 	binaryImage := binaryData
-	
+
 	// building the photo instance
 	currentTime := time.Now()
 	photo := Photo{AuthorID: requestingUser.ID, Format: format, UploadDateTime: currentTime}

@@ -1,5 +1,13 @@
 package api
 
+/*
+go run ./cmd/webapi/
+curl -v \
+	-X DELETE \
+	-H 'Authorization: 2' \
+	localhost:3000/following/{1}
+*/
+
 import (
 	"fmt"
 	"net/http"
@@ -25,7 +33,7 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 		fmt.Fprint(w, "\nunfollowUser: the path parameter {uid} was not a parseable int64 or is missing\n\n")
 		return
 	}
-	follower, present := rt.db.SearchByID(pathUid)
+	followed, present := rt.db.SearchUByID(pathUid)
 	if !present {
 		// the {uid} path parameter is not matching any existing user, rejecting the request
 		w.WriteHeader(http.StatusBadRequest) //400
@@ -33,40 +41,10 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 		fmt.Fprint(w, "\nunfollowUser: the path parameter {uid} is not matching any existing user\n\n")
 		return
 	}
-	
-	// extracting {uid2} parameter from the path
-	var pathUid2 int64
-	pathUid2, err = strconv.ParseInt(ps.ByName("uid"), 10, 64)
-
-	if err != nil {
-		// the path parameter {uid2} was not a parseable int64 or is missing, rejecting the request
-		w.WriteHeader(http.StatusBadRequest) //400
-		ctx.Logger.WithError(err).Error("unfollowUser: the path parameter {uid2} was not a parseable int64 or is missing")
-		fmt.Fprint(w, "\nunfollowUser: the path parameter {uid2} was not a parseable int64 or is missing\n\n")
-		return
-	}
-	followed, present := rt.db.SearchByID(pathUid2)
-	if !present {
-		// the {uid2} path parameter is not matching any existing user, rejecting the request
-		w.WriteHeader(http.StatusBadRequest) //400
-		ctx.Logger.WithError(err).Error("unfollowUser: the path parameter {uid2} is not matching any existing user")
-		fmt.Fprint(w, "\nunfollowUser: the path parameter {uid2} is not matching any existing user\n\n")
-		return
-	}
-
-	// a user cannot unfollow someone who is not following already
-	following := rt.db.CheckFollow(follower.ID, followed.ID)
-	if !following {
-		// rejecting the request
-		w.WriteHeader(http.StatusBadRequest) //400
-		ctx.Logger.WithError(err).Error("unfollowUser: the user is trying to unfollow someone who is not following")
-		fmt.Fprint(w, "\nunfollowUser: the user is trying to unfollow someone who is not following\n\n")
-		return
-	}
 
 	// 2.
 	// authentication phase
-	
+
 	// extracting authorizationUid from the Authorization header
 	var authorizationUid int64
 	authorizationUid, err = strconv.ParseInt(r.Header.Get("Authorization"), 10, 64)
@@ -78,7 +56,7 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 		fmt.Fprint(w, "\nunfollowUser: the user is not authenticated\n\n")
 		return
 	}
-	selectedUser, present := rt.db.SearchByID(authorizationUid)
+	follower, present := rt.db.SearchUByID(authorizationUid)
 	if !present {
 		// the Authorization ID is not matching any existing user, rejecting the request
 		w.WriteHeader(http.StatusBadRequest) //400
@@ -87,14 +65,14 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	// 3.
-	// authorization phase
-	if follower.ID != selectedUser.ID {
-		// the ID of the user attempting the request is different from the one he wants to edit the account of, rejecting the request
-		w.WriteHeader(http.StatusForbidden) //403
-		ctx.Logger.WithError(err).Error("unfollowUser: the ID of the user attempting the request is different from the one he wants to edit the account of")
-		fmt.Fprint(w, "\nunfollowUser: the ID of the user attempting the request is different from the one he wants to to edit the account of\n\n")
-		return		
+	// a user cannot unfollow someone who is not following already
+	following := rt.db.CheckFollow(follower.ID, followed.ID)
+	if !following {
+		// rejecting the request
+		w.WriteHeader(http.StatusBadRequest) //400
+		ctx.Logger.WithError(err).Error("unfollowUser: the user is trying to unfollow someone who is not following")
+		fmt.Fprint(w, "\nunfollowUser: the user is trying to unfollow someone who is not following\n\n")
+		return
 	}
 
 	// remove follow record from database

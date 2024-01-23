@@ -12,17 +12,29 @@ func (rt *_router) Handler() http.Handler {
 	// All operations related to users logging in.
 	rt.router.POST("/session", rt.wrap(rt.doLogin))
 
-	// User endpoint
-	// All operations realated to users managing their own profile.
-	rt.router.PUT("/users/:uid/username", rt.wrap(rt.setMyUserName))
-	rt.router.PUT("/users/:uid/following/:uid2", rt.wrap(rt.followUser))
-	rt.router.DELETE("/users/:uid/following/:uid2", rt.wrap(rt.unfollowUser))
-	rt.router.PUT("/users/:uid/banned/:uid2", rt.wrap(rt.banUser))
-	rt.router.DELETE("/users/:uid/banned/:uid2", rt.wrap(rt.unbanUser))
+
+	// Settings
+	rt.router.PUT("/settings", rt.wrap(rt.setMyUserName))
+
+	// Following endpoint
+	// All operations realated to users following other profiles.
+	rt.router.PUT("/following/:uid", rt.wrap(rt.followUser))
+	rt.router.DELETE("/following/:uid", rt.wrap(rt.unfollowUser))
+
+	// Banned endpoint
+	// All operations realated to users banned list.
+	rt.router.PUT("/banned/:uid", rt.wrap(rt.banUser))
+	rt.router.DELETE("/banned/:uid", rt.wrap(rt.unbanUser))
 	
 	// Photo endpoint
 	// All operations realated to users managing their own profile.
-	rt.router.POST("/users/:uid/photos/", rt.wrap(rt.uploadPhoto))
+	rt.router.POST("/photos/", rt.wrap(rt.uploadPhoto))
+
+	// Browsing endpoint
+	rt.router.GET("/users/:uid", rt.wrap(rt.getUserProfile))
+
+	// Likes endpoint
+	rt.router.PUT("/photos/:pid/likes/:uid", rt.wrap(rt.likePhoto))
 
 	// Getters
 	rt.router.GET("/photos/:pid", rt.wrap(rt.getPhoto))

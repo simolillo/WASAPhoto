@@ -7,7 +7,7 @@ curl -v \
 	-H 'Content-Type: text/plain' \
 	-H 'Authorization: 1' \
 	-d "Lilla" \
-	localhost:3000/users/{1}/username
+	localhost:3000/settings
 */
 
 /*
@@ -70,13 +70,14 @@ Possible outcomes:
 */
 
 import (
-	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
-	"github.com/julienschmidt/httprouter"
 	"encoding/json"
-	"net/http"
-	"strconv"
 	"fmt"
 	"io"
+	"net/http"
+	"strconv"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 )
 
 /*
@@ -90,31 +91,9 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	// setting response header
 	w.Header().Set("Content-Type", "application/json")
 
-	// extracting {uid} parameter from the path
-	var pathUid int64
-	pathUid, err := strconv.ParseInt(ps.ByName("uid"), 10, 64)
-
-	// 1.
-	// checking if the request is valid
-	if err != nil {
-		// the path parameter {uid} was not a parseable int64 or is missing, rejecting the request
-		w.WriteHeader(http.StatusBadRequest) //400
-		ctx.Logger.WithError(err).Error("setMyUserName: the path parameter {uid} was not a parseable int64 or is missing")
-		fmt.Fprint(w, "\nsetMyUserName: the path parameter {uid} was not a parseable int64 or is missing\n\n")
-		return
-	}
-	selectedUser1, present := rt.db.SearchByID(pathUid)
-	if !present {
-		// the {uid} path parameter is not matching any existing user, rejecting the request
-		w.WriteHeader(http.StatusBadRequest) //400
-		ctx.Logger.WithError(err).Error("setMyUserName: the path parameter {uid} is not matching any existing user")
-		fmt.Fprint(w, "\nsetMyUserName: the path parameter {uid} is not matching any existing user\n\n")
-		return
-	}
-
 	// extracting authorizationUid from the Authorization header
 	var authorizationUid int64
-	authorizationUid, err = strconv.ParseInt(r.Header.Get("Authorization"), 10, 64)
+	authorizationUid, err := strconv.ParseInt(r.Header.Get("Authorization"), 10, 64)
 
 	// 2.
 	// authentication phase
@@ -125,7 +104,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 		fmt.Fprint(w, "\nsetMyUserName: the user is not authenticated\n\n")
 		return
 	}
-	selectedUser2, present := rt.db.SearchByID(authorizationUid)
+	selectedUser, present := rt.db.SearchUByID(authorizationUid)
 	if !present {
 		// the Authorization ID is not matching any existing user, rejecting the request
 		w.WriteHeader(http.StatusBadRequest) //400
@@ -134,18 +113,8 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
-	// 3.
-	// authorization phase
-	if selectedUser1.ID != selectedUser2.ID {
-		// the ID of the user attempting the request is different from the one he wants to update the username of, rejecting the request
-		w.WriteHeader(http.StatusForbidden) //403
-		ctx.Logger.WithError(err).Error("setMyUserName: the ID of the user attempting the request is different from the one he wants to update the username of")
-		fmt.Fprint(w, "\nsetMyUserName: the ID of the user attempting the request is different from the one he wants to update the username of\n\n")
-		return		
-	}
-
 	// the user is both authenticated and authorized
-	requestingUser := selectedUser1
+	requestingUser := selectedUser
 
 	// extracting username from the request body
 	body, err := io.ReadAll(r.Body)
