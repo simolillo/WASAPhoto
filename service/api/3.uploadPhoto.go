@@ -90,12 +90,13 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	// setting response header
 	w.Header().Set("Content-Type", "application/json")
 
+	// 1.
+	// checking if the request is valid
+	
 	// extracting {uid} parameter from the path
 	var pathUid int64
 	pathUid, err := strconv.ParseInt(ps.ByName("uid"), 10, 64)
 
-	// 1.
-	// checking if the request is valid
 	if err != nil {
 		// the path parameter {uid} was not a parseable int64 or is missing, rejecting the request
 		w.WriteHeader(http.StatusBadRequest) //400
@@ -112,12 +113,13 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 	
+	// 2.
+	// authentication phase
+	
 	// extracting authorizationUid from the Authorization header
 	var authorizationUid int64
 	authorizationUid, err = strconv.ParseInt(r.Header.Get("Authorization"), 10, 64)
 
-	// 2.
-	// authentication phase
 	if err != nil {
 		// the Authorization header is not present or no value is specified, rejecting the request
 		w.WriteHeader(http.StatusUnauthorized) //401

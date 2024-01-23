@@ -24,3 +24,10 @@ func (db *appdbimpl) CreatePhoto(photo Photo) (Photo, error) {
 	_, err = db.c.Exec("UPDATE photos SET path = ? WHERE photoID = ?", photo.Path, photo.ID)
 	return photo, err
 }
+
+
+func (db *appdbimpl) GetFromDatabase(photoID int64) (Photo, error) {
+	var photo Photo
+	err := db.c.QueryRow("SELECT * FROM photos WHERE photoID = ?;", photoID).Scan(&photo)
+	return photo, err
+}

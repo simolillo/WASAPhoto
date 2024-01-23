@@ -3,14 +3,12 @@ package fs
 // "github.com/simolillo/WASAPhoto/service/fileSystem"
 
 import (
-
+	"fmt"
 	"os"
 	"path/filepath"
 )
 
-var Root = filepath.Join("/tmp", "photos")
-
-
+var Root = filepath.Join("/private", "tmp", "photos")
 
 
 // Funzione per creare una nuova photo file
@@ -21,7 +19,9 @@ func CreatePhotoFile(photo Photo, binaryImage []byte) error {
 		return err
 	}
 
-	createdFile, err := os.Create(photo.Path)
+	photoPath := filepath.Join(Root, fmt.Sprint(photo.ID) + "." + photo.Format)
+
+	createdFile, err := os.Create(photoPath)
 	if err != nil {
 		return err
 	}

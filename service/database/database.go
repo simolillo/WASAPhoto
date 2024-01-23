@@ -47,9 +47,30 @@ type AppDatabase interface {
 	
 	// Creates a new user in the database.
 	CreateUser(username string) (User, error)
+	
+	// Follow a user.
+	FollowUser(followerID int64, followedID int64) error
+
+	// Unfollow a user.
+	UnfollowUser(followerID int64, followedID int64) error
+
+	// Unban a user.
+	UnbanUser(bannerID int64, bannedID int64) error
+
+	// Ban a user.
+	BanUser(bannerID int64, bannedID int64) error
+
+	// Get photo from database
+	GetFromDatabase(photoID int64) (Photo, error)
 
 	// Searches for a specific user in the database given its username.
 	SearchByUsername(targetUsername string) (selectedUser User, present bool)
+
+	// Checks follow
+	CheckFollow(userID1 int64, userID2 int64) (following bool)
+
+	// Checks ban
+	CheckBan(userID1 int64, userID2 int64) (banned bool)
 
 	// Searches for a specific user in the database given its user ID.
 	SearchByID(targetUserID int64) (selectedUser User, present bool)
@@ -95,7 +116,7 @@ func (db *appdbimpl) Ping() error {
 
 // This function creates the entire structure of the database (tables and relations) through SQL statements.
 func createDatabase(db *sql.DB) error {
-	tables := [2]string{
+	tables := [4]string{
 		`CREATE TABLE IF NOT EXISTS users (
 			userID INTEGER NOT NULL PRIMARY KEY,
 			username VARCHAR(16) NOT NULL UNIQUE
@@ -107,6 +128,20 @@ func createDatabase(db *sql.DB) error {
 			format VARCHAR(4) NOT NULL,
 			uploadDateTime DATETIME NOT NULL,
 			FOREIGN KEY (authorID) REFERENCES users(userID) ON DELETE CASCADE
+			);`,
+		`CREATE TABLE IF NOT EXISTS follow(
+			followerID INTEGER NOT NULL,
+			followedID INTEGER NOT NULL,
+			PRIMARY KEY (followerID, followedID),
+			FOREIGN KEY (followerID) REFERENCES users(userID) ON DELETE CASCADE,
+			FOREIGN KEY (followedID) REFERENCES users(userID) ON DELETE CASCADE
+			);`,
+		`CREATE TABLE IF NOT EXISTS ban (
+			bannerID INTEGER NOT NULL,
+			bannedID INTEGER NOT NULL,
+			PRIMARY KEY (bannerID, bannedID),
+			FOREIGN KEY (bannerID) REFERENCES users (userID) ON DELETE CASCADE,
+			FOREIGN KEY (bannedID) REFERENCES users (userID) ON DELETE CASCADE
 			);`,
 	}
 
