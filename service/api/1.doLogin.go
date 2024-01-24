@@ -5,17 +5,16 @@ go run ./cmd/webapi/
 curl -v \
 	-X POST \
 	-H 'Content-Type: application/json' \
-	-d '{"username": "Lillo"}' \
+	-d '{"username": "Simo"}' \
 	localhost:3000/session
 */
 
 import (
-	"encoding/json"
-	"fmt"
-	"net/http"
-
-	"github.com/julienschmidt/httprouter"
 	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
+	"github.com/julienschmidt/httprouter"
+	"encoding/json"
+	"net/http"
+	"fmt"
 )
 
 func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
