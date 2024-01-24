@@ -45,62 +45,9 @@ import (
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
 
-	// Creates a new user in the database.
-	CreateUser(username string) (User, error)
-
-	// Follow a user.
-	FollowUser(followerID int64, followedID int64) error
-
-	// Unfollow a user.
-	UnfollowUser(followerID int64, followedID int64) error
-
-	// Unban a user.
-	UnbanUser(bannerID int64, bannedID int64) error
-
-	// Ban a user.
-	BanUser(bannerID int64, bannedID int64) error
-
-	// Get photo from database
-	GetFromDatabase(photoID int64) (Photo, error)
-
-	// Get user profile info
-	GetUserProfile(userID int64, viewerID int64) (Profile, error)
-
-	// Searches for a specific user in the database given its username.
-	SearchByUsername(targetUsername string) (selectedUser User, present bool)
-
-	// Checks follow
-	CheckFollow(userID1 int64, userID2 int64) (following bool)
-
-	// Put like to photo
-	LikePhoto(photoID int64, userID int64) error
-
-	// Remove like to photo
-	UnlikePhoto(photoID int64, userID int64) error
-
-	// Checks ban
-	CheckBan(userID1 int64, userID2 int64) (banned bool)
-
-	// Searches for a specific user in the database given its user ID.
-	SearchUByID(targetUserID int64) (selectedUser User, present bool)
-
-	// Searches for a specific comment in the database given its ID.
-	SearchCByID(commentID int64) (selectedComment Comment, present bool)
-
-	SearchPByID(targetPhotoID int64) (selectedPhoto Photo, present bool)
-
-	UncommentPhoto(commentID int64) error
-
-	DeletePhoto(photoID int64) error
-
-	// Updates the username of a specific user in the database.
-	UpdateUsername(userID int64, newUsername string) (User, error)
-
-	// Creates a new photo in the database.
-	CreatePhoto(photo Photo) (Photo, error)
-
-	// Commment a photo
-	CommentPhoto(comment Comment) (Comment, error)
+	// User
+	CreateUser(username string) (user User, err error)
+	SearchUserByUsername(username string) (user User, present bool, err error)
 
 	Ping() error
 }
@@ -137,39 +84,10 @@ func (db *appdbimpl) Ping() error {
 
 // This function creates the entire structure of the database (tables and relations) through SQL statements.
 func createDatabase(db *sql.DB) error {
-	tables := [6]string{
+	tables := [1]string{
 		`CREATE TABLE IF NOT EXISTS users (
 			userID INTEGER NOT NULL PRIMARY KEY,
 			username VARCHAR(16) NOT NULL UNIQUE
-			);`,
-		`CREATE TABLE IF NOT EXISTS photos (
-			photoID INTEGER NOT NULL PRIMARY KEY,
-			authorID INTEGER NOT NULL REFERENCES users (userID) ON DELETE CASCADE,
-			path VARCHAR,
-			format VARCHAR(4) NOT NULL,
-			uploadDateTime DATETIME NOT NULL
-			);`,
-		`CREATE TABLE IF NOT EXISTS follow (
-			followerID INTEGER NOT NULL REFERENCES users (userID) ON DELETE CASCADE,
-			followedID INTEGER NOT NULL REFERENCES users (userID) ON DELETE CASCADE,
-			PRIMARY KEY (followerID, followedID)
-			);`,
-		`CREATE TABLE IF NOT EXISTS ban (
-			bannerID INTEGER NOT NULL REFERENCES users (userID) ON DELETE CASCADE,
-			bannedID INTEGER NOT NULL REFERENCES users (userID) ON DELETE CASCADE,
-			PRIMARY KEY (bannerID, bannedID)
-			);`,
-		`CREATE TABLE IF NOT EXISTS likes (
-			userID INTEGER NOT NULL REFERENCES users (userID) ON DELETE CASCADE,
-			photoID INTEGER NOT NULL REFERENCES photos (photoID) ON DELETE CASCADE,
-			PRIMARY KEY (photoID, userID)
-			);`,
-		`CREATE TABLE IF NOT EXISTS comments (
-			commentID INTEGER NOT NULL PRIMARY KEY,
-			commentText TEXT NOT NULL,
-			photoID INTEGER NOT NULL REFERENCES photos (photoID) ON DELETE CASCADE,
-			authorID INTEGER NOT NULL REFERENCES users (userID) ON DELETE CASCADE,
-			publishDate DATETIME NOT NULL
 			);`,
 	}
 
@@ -179,7 +97,6 @@ func createDatabase(db *sql.DB) error {
 		_, err := db.Exec(sqlStmt)
 
 		if err != nil {
-			fmt.Printf("Error executing SQL statement:\n%s\nError: %v\n", sqlStmt, err)
 			return err
 		}
 	}
