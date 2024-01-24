@@ -4,7 +4,7 @@ package api
 go run ./cmd/webapi/
 curl -v \
 	-X PUT \
-	-H 'Authorization: 3' \
+	-H 'Authorization: 2' \
 	localhost:3000/following/{1}
 */
 

@@ -91,6 +91,8 @@ type AppDatabase interface {
 
 	UncommentPhoto(commentID int64) error
 
+	DeletePhoto(photoID int64) error
+
 	// Updates the username of a specific user in the database.
 	UpdateUsername(userID int64, newUsername string) (User, error)
 
@@ -142,41 +144,32 @@ func createDatabase(db *sql.DB) error {
 			);`,
 		`CREATE TABLE IF NOT EXISTS photos (
 			photoID INTEGER NOT NULL PRIMARY KEY,
-			authorID INTEGER NOT NULL,
+			authorID INTEGER NOT NULL REFERENCES users (userID) ON DELETE CASCADE,
 			path VARCHAR,
 			format VARCHAR(4) NOT NULL,
-			uploadDateTime DATETIME NOT NULL,
-			FOREIGN KEY (authorID) REFERENCES users(userID) ON DELETE CASCADE
+			uploadDateTime DATETIME NOT NULL
 			);`,
-		`CREATE TABLE IF NOT EXISTS follow(
-			followerID INTEGER NOT NULL,
-			followedID INTEGER NOT NULL,
-			PRIMARY KEY (followerID, followedID),
-			FOREIGN KEY (followerID) REFERENCES users(userID) ON DELETE CASCADE,
-			FOREIGN KEY (followedID) REFERENCES users(userID) ON DELETE CASCADE
+		`CREATE TABLE IF NOT EXISTS follow (
+			followerID INTEGER NOT NULL REFERENCES users (userID) ON DELETE CASCADE,
+			followedID INTEGER NOT NULL REFERENCES users (userID) ON DELETE CASCADE,
+			PRIMARY KEY (followerID, followedID)
 			);`,
 		`CREATE TABLE IF NOT EXISTS ban (
-			bannerID INTEGER NOT NULL,
-			bannedID INTEGER NOT NULL,
-			PRIMARY KEY (bannerID, bannedID),
-			FOREIGN KEY (bannerID) REFERENCES users(userID) ON DELETE CASCADE,
-			FOREIGN KEY (bannedID) REFERENCES users(userID) ON DELETE CASCADE
+			bannerID INTEGER NOT NULL REFERENCES users (userID) ON DELETE CASCADE,
+			bannedID INTEGER NOT NULL REFERENCES users (userID) ON DELETE CASCADE,
+			PRIMARY KEY (bannerID, bannedID)
 			);`,
 		`CREATE TABLE IF NOT EXISTS likes (
-			photoID INTEGER NOT NULL,
-			userID INTEGER NOT NULL,
-			PRIMARY KEY (photoID, userID),
-			FOREIGN KEY (photoID) REFERENCES photos(photoID) ON DELETE CASCADE
-			FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE
+			userID INTEGER NOT NULL REFERENCES users (userID) ON DELETE CASCADE,
+			photoID INTEGER NOT NULL REFERENCES photos (photoID) ON DELETE CASCADE,
+			PRIMARY KEY (photoID, userID)
 			);`,
 		`CREATE TABLE IF NOT EXISTS comments (
 			commentID INTEGER NOT NULL PRIMARY KEY,
 			commentText TEXT NOT NULL,
-			photoID INTEGER NOT NULL,
-			authorID INTEGER NOT NULL,
-			publishDate DATETIME NOT NULL,
-			FOREIGN KEY(photoID) REFERENCES photos (photoID) ON DELETE CASCADE,
-			FOREIGN KEY(authorID) REFERENCES users (userID) ON DELETE CASCADE
+			photoID INTEGER NOT NULL REFERENCES photos (photoID) ON DELETE CASCADE,
+			authorID INTEGER NOT NULL REFERENCES users (userID) ON DELETE CASCADE,
+			publishDate DATETIME NOT NULL
 			);`,
 	}
 
@@ -186,6 +179,7 @@ func createDatabase(db *sql.DB) error {
 		_, err := db.Exec(sqlStmt)
 
 		if err != nil {
+			fmt.Printf("Error executing SQL statement:\n%s\nError: %v\n", sqlStmt, err)
 			return err
 		}
 	}

@@ -29,6 +29,7 @@ func (rt *_router) Handler() http.Handler {
 	// Photo endpoint
 	// All operations realated to users managing their own profile.
 	rt.router.POST("/photos/", rt.wrap(rt.uploadPhoto))
+	rt.router.DELETE("/photos/:pid", rt.wrap(rt.deletePhoto))
 
 	// Browsing endpoint
 	rt.router.GET("/users/:uid", rt.wrap(rt.getUserProfile))

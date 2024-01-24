@@ -84,6 +84,11 @@ func (db *appdbimpl) UnlikePhoto(photoID int64, userID int64) error {
 	return err
 }
 
+func (db *appdbimpl) DeletePhoto(photoID int64) error {
+	_, err := db.c.Exec("DELETE FROM photos WHERE photoID = ?", photoID)
+	return err
+}
+
 func (db *appdbimpl) UncommentPhoto(commentID int64) error {
 	_, err := db.c.Exec("DELETE FROM comments WHERE commentID = ?", commentID)
 	return err

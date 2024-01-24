@@ -31,3 +31,12 @@ func CreatePhotoFile(photo Photo, binaryImage []byte) error {
 
 	return err
 }
+
+// Function to delete a photo file
+func DeletePhotoFile(photo Photo) error {
+    photoPath := filepath.Join(Root, fmt.Sprintf("%d.%s", photo.ID, photo.Format))
+
+    err := os.Remove(photoPath)
+    return err
+}
+
