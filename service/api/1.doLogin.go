@@ -5,7 +5,7 @@ go run ./cmd/webapi/
 curl -v \
 	-X POST \
 	-H 'Content-Type: text/plain' \
-	-d "Lilla" \
+	-d "rick" \
 	localhost:3000/session
 */
 

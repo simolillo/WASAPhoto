@@ -4,8 +4,8 @@ package api
 go run ./cmd/webapi/
 curl -v \
 	-X PUT \
-	-H 'Authorization: 1' \
-	localhost:3000/photos/{1}/likes/{1}
+	-H 'Authorization: 2' \
+	localhost:3000/photos/{1}/likes/{2}
 */
 
 import (
@@ -91,6 +91,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		w.WriteHeader(http.StatusBadRequest) //400
 		ctx.Logger.WithError(err).Error("likePhoto: the Authorization ID is not matching path uid")
 		fmt.Fprint(w, "\nlikePhoto: the Authorization ID is not matching path uid\n\n")
+		return
 	}
 
 

@@ -20,6 +20,14 @@ type Photo struct {
 	UploadDateTime time.Time    `json:"uploadDateTime"`
 }
 
+type Comment struct {
+	ID int64                 `json:"commentID"`
+	Text string           `json:"commentText"`
+	PhotoID int64              `json:"photoID"`
+	AuthorID int64            `json:"authorID"`
+	PublishDate time.Time    `json:"publishDate"`
+}
+
 type Profile struct {
 	Username string                 `json:"username"`
 	Posts int64           `json:"posts"`

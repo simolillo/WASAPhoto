@@ -27,6 +27,18 @@ func (db *appdbimpl) CreatePhoto(photo Photo) (Photo, error) {
 	return photo, err
 }
 
+func (db *appdbimpl) CommentPhoto(comment Comment) (Comment, error) {
+	// since commentID value is not specified, SQLite automatically assigns the next sequential integer
+	sqlResult, err := db.c.Exec("INSERT INTO comments (commentText, photoID, authorID, publishDate) VALUES (?,?,?,?)", comment.Text, comment.PhotoID, comment.AuthorID, comment.PublishDate)
+	if err != nil {
+		return comment, err
+	}
+
+	comment.ID, err = sqlResult.LastInsertId()
+
+	return comment, err
+}
+
 
 func (db *appdbimpl) GetFromDatabase(photoID int64) (Photo, error) {
 	var photo Photo
@@ -49,7 +61,30 @@ func (db *appdbimpl) SearchPByID(targetPhotoID int64) (selectedPhoto Photo, pres
 	return
 }
 
+func (db *appdbimpl) SearchCByID(commentID int64) (selectedComment Comment, present bool) {
+	err := db.c.QueryRow("SELECT * FROM comments WHERE commentID = ?;", commentID).Scan(&selectedComment.ID, &selectedComment.Text, &selectedComment.PhotoID, &selectedComment.AuthorID, &selectedComment.PublishDate)
+
+	// if the query selects no rows
+	if err == sql.ErrNoRows {
+		present = false
+		return
+	}
+
+	present = true
+	return
+}
+
 func (db *appdbimpl) LikePhoto(photoID int64, userID int64) error {
 	_, err := db.c.Exec("INSERT INTO likes (photoID, userID) VALUES (?,?)", photoID, userID)
+	return err
+}
+
+func (db *appdbimpl) UnlikePhoto(photoID int64, userID int64) error {
+	_, err := db.c.Exec("DELETE FROM likes WHERE (photoID = ? AND userID = ?)", photoID, userID)
+	return err
+}
+
+func (db *appdbimpl) UncommentPhoto(commentID int64) error {
+	_, err := db.c.Exec("DELETE FROM comments WHERE commentID = ?", commentID)
 	return err
 }

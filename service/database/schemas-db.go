@@ -24,3 +24,11 @@ type Profile struct {
 	Following int64            `json:"following"`
 	IsFollowedByViewer bool   `json:"isFollowedByViewer"`
 }
+
+type Comment struct {
+	ID int64                 `json:"commentID"`
+	Text string           `json:"commentText"`
+	PhotoID int64              `json:"photoID"`
+	AuthorID int64            `json:"authorID"`
+	PublishDate time.Time    `json:"publishDate"`
+}

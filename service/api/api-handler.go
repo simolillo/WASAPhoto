@@ -35,7 +35,12 @@ func (rt *_router) Handler() http.Handler {
 
 	// Likes endpoint
 	rt.router.PUT("/photos/:pid/likes/:uid", rt.wrap(rt.likePhoto))
-
+	rt.router.DELETE("/photos/:pid/likes/:uid", rt.wrap(rt.unlikePhoto))
+	
+	// Comments endpoint
+	rt.router.POST("/photos/:pid/comments/", rt.wrap(rt.commentPhoto))
+	rt.router.DELETE("/photos/:pid/comments/:cid", rt.wrap(rt.uncommentPhoto))
+	
 	// Getters
 	rt.router.GET("/photos/:pid", rt.wrap(rt.getPhoto))
 

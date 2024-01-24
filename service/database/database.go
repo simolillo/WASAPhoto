@@ -75,19 +75,30 @@ type AppDatabase interface {
 	// Put like to photo
 	LikePhoto(photoID int64, userID int64) error
 
+	// Remove like to photo
+	UnlikePhoto(photoID int64, userID int64) error
+
 	// Checks ban
 	CheckBan(userID1 int64, userID2 int64) (banned bool)
 
 	// Searches for a specific user in the database given its user ID.
 	SearchUByID(targetUserID int64) (selectedUser User, present bool)
 
+	// Searches for a specific comment in the database given its ID.
+	SearchCByID(commentID int64) (selectedComment Comment, present bool)
+
 	SearchPByID(targetPhotoID int64) (selectedPhoto Photo, present bool)
+
+	UncommentPhoto(commentID int64) error
 
 	// Updates the username of a specific user in the database.
 	UpdateUsername(userID int64, newUsername string) (User, error)
 
 	// Creates a new photo in the database.
 	CreatePhoto(photo Photo) (Photo, error)
+
+	// Commment a photo
+	CommentPhoto(comment Comment) (Comment, error)
 
 	Ping() error
 }
@@ -124,7 +135,7 @@ func (db *appdbimpl) Ping() error {
 
 // This function creates the entire structure of the database (tables and relations) through SQL statements.
 func createDatabase(db *sql.DB) error {
-	tables := [5]string{
+	tables := [6]string{
 		`CREATE TABLE IF NOT EXISTS users (
 			userID INTEGER NOT NULL PRIMARY KEY,
 			username VARCHAR(16) NOT NULL UNIQUE
@@ -157,6 +168,15 @@ func createDatabase(db *sql.DB) error {
 			PRIMARY KEY (photoID, userID),
 			FOREIGN KEY (photoID) REFERENCES photos(photoID) ON DELETE CASCADE
 			FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE
+			);`,
+		`CREATE TABLE IF NOT EXISTS comments (
+			commentID INTEGER NOT NULL PRIMARY KEY,
+			commentText TEXT NOT NULL,
+			photoID INTEGER NOT NULL,
+			authorID INTEGER NOT NULL,
+			publishDate DATETIME NOT NULL,
+			FOREIGN KEY(photoID) REFERENCES photos (photoID) ON DELETE CASCADE,
+			FOREIGN KEY(authorID) REFERENCES users (userID) ON DELETE CASCADE
 			);`,
 	}
 

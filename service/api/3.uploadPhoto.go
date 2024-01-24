@@ -5,7 +5,7 @@ go run ./cmd/webapi/
 curl -v \
 	-X POST \
 	-H 'Content-Type: image/*' \
-	-H 'Authorization: 2' \
+	-H 'Authorization: 1' \
 	--data-binary "@/Users/simonerussolillo/Pictures/Random/rainforest.png" \
 	localhost:3000/photos/
 */
@@ -76,7 +76,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 	"github.com/simolillo/WASAPhoto/service/database"
-	fs "github.com/simolillo/WASAPhoto/service/fileSystem"
+	"github.com/simolillo/WASAPhoto/service/fileSystem"
 )
 
 /*
