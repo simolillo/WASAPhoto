@@ -21,19 +21,22 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	var user User
 	err := json.NewDecoder(r.Body).Decode(&user)
-	
+
 	// BadRequest check
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		stringErr := "doLogIn: invalid JSON object"
+		http.Error(w, stringErr, http.StatusBadRequest)
 		return
-	} else if !user.IsValid() {
-		w.WriteHeader(http.StatusBadRequest)
+	}
+	if !user.HasValidUsername() {
+		stringErr := "doLogIn: invalid username"
+		http.Error(w, stringErr, http.StatusBadRequest)
 		return
 	}
 
 	// database section
 	dbUser, present, err := rt.db.SearchUserByUsername(user.Name)
-	
+
 	// InternalServerError check
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -45,7 +48,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		w.Header().Set("Content-Type", "application/json")
 		user.FromDatabase(dbUser)
 		_ = json.NewEncoder(w).Encode(user)
-		fmt.Fprint(w, "\ndoLogIn: log-in successful")
+		fmt.Fprint(w, "\ndoLogIn: log-in successful\n\n")
 		return
 	} else {
 		w.WriteHeader(http.StatusCreated)
@@ -57,7 +60,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		}
 		user.FromDatabase(dbUser)
 		_ = json.NewEncoder(w).Encode(user)
-		fmt.Fprint(w, "\ndoLogIn: sign-up successful")
+		fmt.Fprint(w, "\ndoLogIn: sign-up successful\n\n")
 		return
 	}
 }

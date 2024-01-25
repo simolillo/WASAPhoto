@@ -45,9 +45,19 @@ import (
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
 
-	// User
+	// Users table
 	CreateUser(username string) (user User, err error)
-	SearchUserByUsername(username string) (user User, present bool, err error)
+	UpdateUsername(dbUser User) (err error)
+	SearchUserByUsername(username string) (dbUser User, present bool, err error)
+	SearchUserByID(ID uint64) (dbUser User, present bool, err error)
+
+	// Following table
+	FollowUser(followerID uint64, followedID uint64) (err error)
+	RemoveFollow(followerID uint64, followedID uint64) (err error)
+
+	// Banned table
+	BanUser(bannerID uint64, bannedID uint64) (err error)
+	CheckBan(bannerID uint64, bannedID uint64) (isBanned bool, err error)
 
 	Ping() error
 }
@@ -84,10 +94,20 @@ func (db *appdbimpl) Ping() error {
 
 // This function creates the entire structure of the database (tables and relations) through SQL statements.
 func createDatabase(db *sql.DB) error {
-	tables := [1]string{
+	tables := [3]string{
 		`CREATE TABLE IF NOT EXISTS users (
 			userID INTEGER NOT NULL PRIMARY KEY,
 			username VARCHAR(16) NOT NULL UNIQUE
+			);`,
+		`CREATE TABLE IF NOT EXISTS following (
+			followerID INTEGER NOT NULL REFERENCES users (userID),
+			followedID INTEGER NOT NULL REFERENCES users (userID),
+			PRIMARY KEY (followerID, followedID)
+			);`,
+		`CREATE TABLE IF NOT EXISTS banned (
+			bannerID INTEGER NOT NULL REFERENCES users (userID),
+			bannedID INTEGER NOT NULL REFERENCES users (userID),
+			PRIMARY KEY (bannerID, bannedID)
 			);`,
 	}
 

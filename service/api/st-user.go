@@ -6,16 +6,16 @@ import (
 )
 
 type User struct {
-	ID uint64   `json:"userID"`
+	ID   uint64 `json:"userID"`
 	Name string `json:"username"`
 }
 
-func (u *User) IsValid() bool {
+func (u *User) HasValidUsername() bool {
 	username := strings.TrimSpace(u.Name)
 	if username == "" {
 		return false
 	}
-	if len(username)<3 || len(username)>16 {
+	if len(username) < 3 || len(username) > 16 {
 		return false
 	}
 	return true

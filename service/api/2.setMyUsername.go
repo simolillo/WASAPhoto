@@ -13,8 +13,10 @@ curl -v \
 import (
 	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 	"github.com/julienschmidt/httprouter"
+	"encoding/json"
 	"net/http"
 	"strconv"
+	"fmt"
 )
 
 func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -22,9 +24,50 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	var token uint64
 	token, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 
+	// Unauthorized check
 	if err != nil {
-		http.Error(w, "Invalid authorization token", htt)
+		stringErr := "setMyUserName: invalid authorization token"
+		http.Error(w, stringErr, http.StatusUnauthorized)
+		return
+	}
+	dbUser, present, err := rt.db.SearchUserByID(token)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if !present {
+		stringErr := "setMyUserName: authorization token not matching any user"
+		http.Error(w, stringErr, http.StatusUnauthorized)
 		return
 	}
 
+	var updatedUser User
+	updatedUser.FromDatabase(dbUser)
+	err = json.NewDecoder(r.Body).Decode(&updatedUser)
+
+	// BadRequest check
+	if err != nil {
+		stringErr := "setMyUserName: invalid JSON object"
+		http.Error(w, stringErr, http.StatusBadRequest)
+		return
+	}
+	if !updatedUser.HasValidUsername() {
+		stringErr := "setMyUserName: invalid username"
+		http.Error(w, stringErr, http.StatusBadRequest)
+		return
+	}
+
+	// database section
+	err = rt.db.UpdateUsername(updatedUser.ToDatabase())
+	
+	// InternalServerError check
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(updatedUser)
+	fmt.Fprint(w, "\nsetMyUserName: username updated\n\n")
 }
