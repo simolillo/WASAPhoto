@@ -8,6 +8,14 @@ func (db *appdbimpl) BanUser(bannerID uint64, bannedID uint64) (err error) {
 	return err
 }
 
+func (db *appdbimpl) RemoveBan(bannerID uint64, bannedID uint64) (err error) {
+
+	query := "DELETE FROM banned WHERE (bannerID = ? AND bannedID = ?)"
+
+	_, err = db.c.Exec(query, bannerID, bannedID)
+	return err
+}
+
 func (db *appdbimpl) CheckBan(bannerID uint64, bannedID uint64) (isBanned bool, err error) {
 
 	query := "SELECT EXISTS (SELECT _ FROM banned WHERE bannerID = ? AND bannedID = ?);"

@@ -57,6 +57,7 @@ type AppDatabase interface {
 
 	// Banned table
 	BanUser(bannerID uint64, bannedID uint64) (err error)
+	RemoveBan(bannerID uint64, bannedID uint64) (err error)
 	CheckBan(bannerID uint64, bannedID uint64) (isBanned bool, err error)
 
 	Ping() error

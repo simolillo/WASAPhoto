@@ -3,9 +3,9 @@ package api
 /*
 go run ./cmd/webapi/
 curl -v \
-	-X DELETE \
+	-X PUT \
 	-H 'Authorization: 2' \
-	localhost:3000/following/{1}
+	localhost:3000/banned/{1}
 */
 
 import (
@@ -17,24 +17,24 @@ import (
 	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 )
 
-func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var token uint64
 	token, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 
 	// Unauthorized check
 	if err != nil {
-		stringErr := "unfollowUser: invalid authorization token"
+		stringErr := "banUser: invalid authorization token"
 		http.Error(w, stringErr, http.StatusUnauthorized)
 		return
 	}
-	follower, present, err := rt.db.SearchUserByID(token)
+	banner, present, err := rt.db.SearchUserByID(token)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if !present {
-		stringErr := "unfollowUser: authorization token not matching any user"
+		stringErr := "banUser: authorization token not matching any user"
 		http.Error(w, stringErr, http.StatusUnauthorized)
 		return
 	}
@@ -44,23 +44,28 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 
 	// BadRequest check
 	if err != nil {
-		stringErr := "unfollowUser: invalid path parameter uid"
+		stringErr := "banUser: invalid path parameter uid"
 		http.Error(w, stringErr, http.StatusBadRequest)
 		return
 	}
-	followed, present, err := rt.db.SearchUserByID(pathUid)
+	banned, present, err := rt.db.SearchUserByID(pathUid)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if !present {
-		stringErr := "unfollowUser: path parameter uid not matching any user"
+		stringErr := "banUser: path parameter uid not matching any user"
+		http.Error(w, stringErr, http.StatusBadRequest)
+		return
+	}
+	if banner.ID == banned.ID {
+		stringErr := "banUser: requesting user trying to ban himself"
 		http.Error(w, stringErr, http.StatusBadRequest)
 		return
 	}
 
 	// database section
-	err = rt.db.RemoveFollow(follower.ID, followed.ID)
+	err = rt.db.BanUser(banner.ID, banned.ID)
 
 	// InternalServerError check
 	if err != nil {
@@ -68,6 +73,17 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
+	err = rt.db.RemoveFollow(banner.ID, banned.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = rt.db.RemoveFollow(banned.ID, banner.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusNoContent)
-	fmt.Fprint(w, "\nunfollowUser: you stopped following a user\n\n")
+	fmt.Fprint(w, "\nbanUser: you banned a user\n\n")
 }
