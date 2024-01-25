@@ -73,23 +73,13 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	// Forbidden check
-	isBanned, err := rt.db.CheckBan(follower.ID, followed.ID)
+	someoneIsBanned, err := rt.db.CheckBanBothDirections(follower.ID, followed.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if isBanned {
-		stringErr := "followUser: follower banned followed"
-		http.Error(w, stringErr, http.StatusForbidden)
-		return
-	}
-	isBanned, err = rt.db.CheckBan(followed.ID, follower.ID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if isBanned {
-		stringErr := "followUser: followed banned follower"
+	if someoneIsBanned {
+		stringErr := "followUser: someone has banned the other"
 		http.Error(w, stringErr, http.StatusForbidden)
 		return
 	}

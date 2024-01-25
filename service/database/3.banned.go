@@ -24,6 +24,15 @@ func (db *appdbimpl) CheckBan(bannerID uint64, bannedID uint64) (isBanned bool, 
 	return
 }
 
+func (db *appdbimpl) CheckBanBothDirections(user1ID uint64, user2ID uint64) (someoneIsBanned bool, err error) {
+	someoneIsBanned, err = db.CheckBan(user1ID, user2ID)
+	if err != nil || someoneIsBanned {
+		return
+	}
+	someoneIsBanned, err = db.CheckBan(user2ID, user1ID)
+	return
+}
+
 func (db *appdbimpl) CascadeBanBothDirections(user1ID uint64, user2ID uint64) (err error) {
 	err = db.RemoveFollowBothDirections(user1ID, user2ID)
 	if err != nil {

@@ -58,23 +58,13 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	// Forbidden check
-	isBanned, err := rt.db.CheckBan(liker.ID, photo.AuthorID)
+	someoneIsBanned, err := rt.db.CheckBanBothDirections(liker.ID, photo.AuthorID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if isBanned {
-		stringErr := "likePhoto: liker banned photo author"
-		http.Error(w, stringErr, http.StatusForbidden)
-		return
-	}
-	isBanned, err = rt.db.CheckBan(photo.AuthorID, liker.ID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if isBanned {
-		stringErr := "likePhoto: photo author banned liker"
+	if someoneIsBanned {
+		stringErr := "likePhoto: someone has banned the other"
 		http.Error(w, stringErr, http.StatusForbidden)
 		return
 	}

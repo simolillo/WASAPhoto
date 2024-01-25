@@ -9,11 +9,10 @@ curl -v \
 */
 
 import (
+	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
+	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"strconv"
-
-	"github.com/julienschmidt/httprouter"
-	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 )
 
 func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

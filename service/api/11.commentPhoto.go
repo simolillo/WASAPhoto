@@ -11,14 +11,13 @@ curl -v \
 */
 
 import (
+	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
+	"github.com/julienschmidt/httprouter"
 	"encoding/json"
-	"io"
 	"net/http"
 	"strconv"
 	"time"
-
-	"github.com/julienschmidt/httprouter"
-	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
+	"io"
 )
 
 func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -64,23 +63,13 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	// Forbidden check
-	isBanned, err := rt.db.CheckBan(author.ID, photo.AuthorID)
+	someoneIsBanned, err := rt.db.CheckBanBothDirections(author.ID, photo.AuthorID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if isBanned {
-		stringErr := "commentPhoto: comment author banned photo author"
-		http.Error(w, stringErr, http.StatusForbidden)
-		return
-	}
-	isBanned, err = rt.db.CheckBan(photo.AuthorID, author.ID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if isBanned {
-		stringErr := "commentPhoto: photo author banned comment author"
+	if someoneIsBanned {
+		stringErr := "commentPhoto: someone has banned the other"
 		http.Error(w, stringErr, http.StatusForbidden)
 		return
 	}

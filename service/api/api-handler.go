@@ -13,7 +13,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.POST("/session", rt.wrap(rt.doLogin))
 	
 	// Settings
-	rt.router.PUT("/session", rt.wrap(rt.setMyUserName))
+	rt.router.PUT("/settings", rt.wrap(rt.setMyUserName))
 
 	// Following
 	rt.router.PUT("/following/:uid", rt.wrap(rt.followUser))

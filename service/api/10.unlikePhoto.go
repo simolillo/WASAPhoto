@@ -56,6 +56,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		http.Error(w, stringErr, http.StatusBadRequest)
 		return
 	}
+	// delete doesn't raise error if record not present
 
 	// database section
 	err = rt.db.UnlikePhoto(liker.ID, photo.ID)

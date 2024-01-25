@@ -61,6 +61,7 @@ type AppDatabase interface {
 	BanUser(bannerID uint64, bannedID uint64) (err error)
 	UnbanUser(bannerID uint64, bannedID uint64) (err error)
 	CheckBan(bannerID uint64, bannedID uint64) (isBanned bool, err error)
+	CheckBanBothDirections(user1ID uint64, user2ID uint64) (someoneIsBanned bool, err error)
 	CascadeBanBothDirections(user1ID uint64, user2ID uint64) (err error)
 
 	// Photos table

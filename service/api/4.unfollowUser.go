@@ -56,16 +56,7 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 		http.Error(w, stringErr, http.StatusBadRequest)
 		return
 	}
-	isFollowing, err := rt.db.CheckFollow(follower.ID, followed.ID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if !isFollowing {
-		stringErr := "followUser: requesting user not following user yet"
-		http.Error(w, stringErr, http.StatusBadRequest)
-		return
-	}
+	// delete doesn't raise error if record not present
 
 	// database section
 	err = rt.db.UnfollowUser(follower.ID, followed.ID)

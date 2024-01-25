@@ -56,16 +56,7 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 		http.Error(w, stringErr, http.StatusBadRequest)
 		return
 	}
-	isBanned, err := rt.db.CheckBan(banner.ID, banned.ID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if !isBanned {
-		stringErr := "banUser: requesting user hasn't banned user yet"
-		http.Error(w, stringErr, http.StatusForbidden)
-		return
-	}
+	// delete doesn't raise error if record not present
 
 	// database section
 	err = rt.db.UnbanUser(banner.ID, banned.ID)
