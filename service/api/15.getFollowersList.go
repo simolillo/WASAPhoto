@@ -5,7 +5,7 @@ go run ./cmd/webapi/
 curl -v \
 	-X GET \
 	-H 'Authorization: 1' \
-	localhost:3000/users/{1}/
+	localhost:3000/users/{1}/followers/
 */
 
 import (
@@ -16,14 +16,14 @@ import (
 	"strconv"
 )
 
-func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) getFollowersList(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var token uint64
 	token, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 
 	// Unauthorized check
 	if err != nil {
-		stringErr := "getUserProfile: invalid authorization token"
+		stringErr := "getFollowersList: invalid authorization token"
 		http.Error(w, stringErr, http.StatusUnauthorized)
 		return
 	}
@@ -33,7 +33,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 	if !present {
-		stringErr := "getUserProfile: authorization token not matching any existing user"
+		stringErr := "getFollowersList: authorization token not matching any existing user"
 		http.Error(w, stringErr, http.StatusUnauthorized)
 		return
 	}
@@ -43,7 +43,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 
 	// BadRequest check
 	if err != nil {
-		stringErr := "getUserProfile: invalid path parameter uid"
+		stringErr := "getFollowersList: invalid path parameter uid"
 		http.Error(w, stringErr, http.StatusBadRequest)
 		return
 	}
@@ -53,7 +53,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 	if !present {
-		stringErr := "getUserProfile: path parameter uid not matching any existing user"
+		stringErr := "getFollowersList: path parameter uid not matching any existing user"
 		http.Error(w, stringErr, http.StatusBadRequest)
 		return
 	}
@@ -65,22 +65,13 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 	if someoneIsBanned {
-		stringErr := "getUserProfile: someone has banned the other"
+		stringErr := "getFollowersList: someone has banned the other"
 		http.Error(w, stringErr, http.StatusForbidden)
 		return
 	}
 
-	var requestedProfile Profile
-	isFollowing, err := rt.db.CheckFollow(requestingUser.ID, requestedUser.ID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
 	// database section
-	dbProfile, err := rt.db.GetUserProfile(requestedUser.ID)
-	requestedProfile.FromDatabase(dbProfile)
-	requestedProfile.IsFollowedByViewer = isFollowing
+	followersList, err := rt.db.GetFollowersList(requestedUser.ID)
 
 	// InternalServerError check
 	if err != nil {
@@ -90,5 +81,5 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(requestedProfile)
+	_ = json.NewEncoder(w).Encode(followersList)
 }

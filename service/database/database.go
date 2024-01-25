@@ -82,6 +82,9 @@ type AppDatabase interface {
 
 	// Getters
 	GetUserProfile(ID uint64) (dbProfile Profile, err error)
+	GetPhotosList(authorID uint64) (photosList []Photo, err error)
+	GetFollowersList(followedID uint64) (followersList []User, err error)
+	GetFollowingsList(followerID uint64) (followingsList []User, err error)
 
 	Ping() error
 }
