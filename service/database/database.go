@@ -80,6 +80,9 @@ type AppDatabase interface {
 	SearchCommentByID(ID uint64) (dbComment Comment, present bool, err error)
 	RemoveCommentsBothDirections(user1ID uint64, user2ID uint64) (err error)
 
+	// Getters
+	GetUserProfile(ID uint64) (dbProfile Profile, err error)
+
 	Ping() error
 }
 

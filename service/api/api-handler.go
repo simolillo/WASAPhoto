@@ -35,6 +35,9 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.POST("/photos/:pid/comments/", rt.wrap(rt.commentPhoto))
 	rt.router.DELETE("/photos/:pid/comments/:cid", rt.wrap(rt.uncommentPhoto))
 
+	// Getters
+	rt.router.GET("/users/:uid", rt.wrap(rt.getUserProfile))
+
 	// Special routes
 	rt.router.GET("/liveness", rt.liveness)
 
