@@ -9,12 +9,10 @@ curl -v \
 */
 
 import (
-	"fmt"
+	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
+	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"strconv"
-
-	"github.com/julienschmidt/httprouter"
-	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 )
 
 func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -34,7 +32,7 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 	if !present {
-		stringErr := "banUser: authorization token not matching any user"
+		stringErr := "banUser: authorization token not matching any existing user"
 		http.Error(w, stringErr, http.StatusUnauthorized)
 		return
 	}
@@ -54,13 +52,23 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 	if !present {
-		stringErr := "banUser: path parameter uid not matching any user"
+		stringErr := "banUser: path parameter uid not matching any existing user"
 		http.Error(w, stringErr, http.StatusBadRequest)
 		return
 	}
 	if banner.ID == banned.ID {
 		stringErr := "banUser: requesting user trying to ban himself"
 		http.Error(w, stringErr, http.StatusBadRequest)
+		return
+	}
+	isBanned, err := rt.db.CheckBan(banner.ID, banned.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if isBanned {
+		stringErr := "banUser: requesting user already banned user"
+		http.Error(w, stringErr, http.StatusForbidden)
 		return
 	}
 
@@ -73,17 +81,12 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	err = rt.db.RemoveFollow(banner.ID, banned.ID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	err = rt.db.RemoveFollow(banned.ID, banner.ID)
+	// cascade ban
+	err = rt.db.CascadeBanBothDirections(banner.ID, banned.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-	fmt.Fprint(w, "\nbanUser: you banned a user\n\n")
 }

@@ -5,7 +5,7 @@ go run ./cmd/webapi/
 curl -v \
 	-X DELETE \
 	-H 'Authorization: 2' \
-	localhost:3000/following/{1}
+	localhost:3000/likes/{1}
 */
 
 import (
@@ -15,60 +15,50 @@ import (
 	"strconv"
 )
 
-func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var token uint64
 	token, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 
 	// Unauthorized check
 	if err != nil {
-		stringErr := "unfollowUser: invalid authorization token"
+		stringErr := "unlikePhoto: invalid authorization token"
 		http.Error(w, stringErr, http.StatusUnauthorized)
 		return
 	}
-	follower, present, err := rt.db.SearchUserByID(token)
+	liker, present, err := rt.db.SearchUserByID(token)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if !present {
-		stringErr := "unfollowUser: authorization token not matching any existing user"
+		stringErr := "unlikePhoto: authorization token not matching any existing user"
 		http.Error(w, stringErr, http.StatusUnauthorized)
 		return
 	}
 
-	var pathUid uint64
-	pathUid, err = strconv.ParseUint(ps.ByName("uid"), 10, 64)
+	var pathPid uint64
+	pathPid, err = strconv.ParseUint(ps.ByName("pid"), 10, 64)
 
 	// BadRequest check
 	if err != nil {
-		stringErr := "unfollowUser: invalid path parameter uid"
+		stringErr := "unlikePhoto: invalid path parameter pid"
 		http.Error(w, stringErr, http.StatusBadRequest)
 		return
 	}
-	followed, present, err := rt.db.SearchUserByID(pathUid)
+	photo, present, err := rt.db.SearchPhotoByID(pathPid)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if !present {
-		stringErr := "unfollowUser: path parameter uid not matching any existing user"
-		http.Error(w, stringErr, http.StatusBadRequest)
-		return
-	}
-	isFollowing, err := rt.db.CheckFollow(follower.ID, followed.ID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if !isFollowing {
-		stringErr := "followUser: requesting user not following user yet"
+		stringErr := "unlikePhoto: path parameter pid not matching any existing photo"
 		http.Error(w, stringErr, http.StatusBadRequest)
 		return
 	}
 
 	// database section
-	err = rt.db.UnfollowUser(follower.ID, followed.ID)
+	err = rt.db.UnlikePhoto(liker.ID, photo.ID)
 
 	// InternalServerError check
 	if err != nil {

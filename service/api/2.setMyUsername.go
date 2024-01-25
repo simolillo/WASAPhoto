@@ -7,7 +7,7 @@ curl -v \
 	-H 'Authorization: 1' \
 	-H 'Content-Type: application/json' \
 	-d '{"username": "Lillo"}' \
-	localhost:3000/session
+	localhost:3000/settings
 */
 
 import (
@@ -16,7 +16,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"fmt"
 )
 
 func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -36,7 +35,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 	if !present {
-		stringErr := "setMyUserName: authorization token not matching any user"
+		stringErr := "setMyUserName: authorization token not matching any existing user"
 		http.Error(w, stringErr, http.StatusUnauthorized)
 		return
 	}
@@ -66,8 +65,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(updatedUser)
-	fmt.Fprint(w, "\nsetMyUserName: username updated\n\n")
 }

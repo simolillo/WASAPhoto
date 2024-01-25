@@ -14,7 +14,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"encoding/json"
 	"net/http"
-	"fmt"
 )
 
 func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -44,15 +43,14 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	if present {
-		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
 		user.FromDatabase(dbUser)
 		_ = json.NewEncoder(w).Encode(user)
-		fmt.Fprint(w, "\ndoLogIn: log-in successful\n\n")
 		return
 	} else {
-		w.WriteHeader(http.StatusCreated)
 		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
 		dbUser, err = rt.db.CreateUser(user.Name)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -60,7 +58,6 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		}
 		user.FromDatabase(dbUser)
 		_ = json.NewEncoder(w).Encode(user)
-		fmt.Fprint(w, "\ndoLogIn: sign-up successful\n\n")
 		return
 	}
 }

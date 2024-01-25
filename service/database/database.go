@@ -46,19 +46,38 @@ import (
 type AppDatabase interface {
 
 	// Users table
-	CreateUser(username string) (user User, err error)
+	CreateUser(username string) (dbUser User, err error)
 	UpdateUsername(dbUser User) (err error)
 	SearchUserByUsername(username string) (dbUser User, present bool, err error)
 	SearchUserByID(ID uint64) (dbUser User, present bool, err error)
 
 	// Following table
 	FollowUser(followerID uint64, followedID uint64) (err error)
-	RemoveFollow(followerID uint64, followedID uint64) (err error)
+	UnfollowUser(followerID uint64, followedID uint64) (err error)
+	CheckFollow(followerID uint64, followedID uint64) (isFollowing bool, err error)
+	RemoveFollowBothDirections(user1ID uint64, user2ID uint64) (err error)
 
 	// Banned table
 	BanUser(bannerID uint64, bannedID uint64) (err error)
-	RemoveBan(bannerID uint64, bannedID uint64) (err error)
+	UnbanUser(bannerID uint64, bannedID uint64) (err error)
 	CheckBan(bannerID uint64, bannedID uint64) (isBanned bool, err error)
+	CascadeBanBothDirections(user1ID uint64, user2ID uint64) (err error)
+
+	// Photos table
+	CreatePhoto(photo Photo) (dbPhoto Photo, err error)
+	DeletePhoto(ID uint64) (err error)
+	SearchPhotoByID(ID uint64) (dbPhoto Photo, present bool, err error)
+
+	// Likes table
+	LikePhoto(likerID uint64, photoID uint64) (err error)
+	UnlikePhoto(likerID uint64, photoID uint64) (err error)
+	RemoveLikesBothDirections(user1ID uint64, user2ID uint64) (err error)
+
+	// Comments table
+	CommentPhoto(comment Comment) (dbComment Comment, err error)
+	UncommentPhoto(ID uint64) (err error)
+	SearchCommentByID(ID uint64) (dbComment Comment, present bool, err error)
+	RemoveCommentsBothDirections(user1ID uint64, user2ID uint64) (err error)
 
 	Ping() error
 }
@@ -95,7 +114,7 @@ func (db *appdbimpl) Ping() error {
 
 // This function creates the entire structure of the database (tables and relations) through SQL statements.
 func createDatabase(db *sql.DB) error {
-	tables := [3]string{
+	tables := [6]string{
 		`CREATE TABLE IF NOT EXISTS users (
 			userID INTEGER NOT NULL PRIMARY KEY,
 			username VARCHAR(16) NOT NULL UNIQUE
@@ -109,6 +128,24 @@ func createDatabase(db *sql.DB) error {
 			bannerID INTEGER NOT NULL REFERENCES users (userID),
 			bannedID INTEGER NOT NULL REFERENCES users (userID),
 			PRIMARY KEY (bannerID, bannedID)
+			);`,
+		`CREATE TABLE IF NOT EXISTS photos (
+			photoID INTEGER NOT NULL PRIMARY KEY,
+			authorID INTEGER NOT NULL REFERENCES users (userID),
+			format VARCHAR(3) NOT NULL,
+			date DATETIME NOT NULL
+			);`,
+		`CREATE TABLE IF NOT EXISTS likes (
+			likerID INTEGER NOT NULL REFERENCES users (userID),
+			photoID INTEGER NOT NULL REFERENCES photos (photoID),
+			PRIMARY KEY (userID, photoID)
+			);`,
+		`CREATE TABLE IF NOT EXISTS comments (
+			commentID INTEGER NOT NULL PRIMARY KEY,
+			photoID INTEGER NOT NULL REFERENCES photos (photoID),
+			authorID INTEGER NOT NULL REFERENCES users (userID),
+			commentText TEXT NOT NULL,
+			date DATETIME NOT NULL
 			);`,
 	}
 

@@ -13,7 +13,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"strconv"
-	"fmt"
 )
 
 func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -33,7 +32,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 	if !present {
-		stringErr := "followUser: authorization token not matching any user"
+		stringErr := "followUser: authorization token not matching any existing user"
 		http.Error(w, stringErr, http.StatusUnauthorized)
 		return
 	}
@@ -53,12 +52,22 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 	if !present {
-		stringErr := "followUser: path parameter uid not matching any user"
+		stringErr := "followUser: path parameter uid not matching any existing user"
 		http.Error(w, stringErr, http.StatusBadRequest)
 		return
 	}
 	if follower.ID == followed.ID {
 		stringErr := "followUser: requesting user trying to follow himself"
+		http.Error(w, stringErr, http.StatusBadRequest)
+		return
+	}
+	isFollowing, err := rt.db.CheckFollow(follower.ID, followed.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if isFollowing {
+		stringErr := "followUser: requesting user already following user"
 		http.Error(w, stringErr, http.StatusBadRequest)
 		return
 	}
@@ -95,5 +104,4 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-	fmt.Fprint(w, "\nfollowUser: you started following new user\n\n")
 }
