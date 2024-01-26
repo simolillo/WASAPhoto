@@ -40,6 +40,10 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET("/users/:uid/photos/", rt.wrap(rt.getPhotosList))
 	rt.router.GET("/users/:uid/followers/", rt.wrap(rt.getFollowersList))
 	rt.router.GET("/users/:uid/followings/", rt.wrap(rt.getFollowingsList))
+	rt.router.GET("/photos/:pid/", rt.wrap(rt.getPhoto))
+	rt.router.GET("/photos/:pid/likes/", rt.wrap(rt.getLikesList))
+	rt.router.GET("/photos/:pid/comments/", rt.wrap(rt.getCommentsList))
+	rt.router.GET("/stream", rt.wrap(rt.getMyStream))
 
 	// Special routes
 	rt.router.GET("/liveness", rt.liveness)

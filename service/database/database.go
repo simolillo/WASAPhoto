@@ -85,6 +85,9 @@ type AppDatabase interface {
 	GetPhotosList(authorID uint64) (photosList []Photo, err error)
 	GetFollowersList(followedID uint64) (followersList []User, err error)
 	GetFollowingsList(followerID uint64) (followingsList []User, err error)
+	GetLikesList(photoID uint64) (likesList []User, err error)
+	GetCommentsList(photoID uint64) (commentsList []Comment, err error)
+	GetMyStream(requestingUserID uint64) (stream []Photo, err error)
 
 	Ping() error
 }

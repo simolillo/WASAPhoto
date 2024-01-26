@@ -4,7 +4,7 @@ import "database/sql"
 
 func (db *appdbimpl) CommentPhoto(comment Comment) (dbComment Comment, err error) {
 
-	query := "INSERT INTO comments (photoID, authorID, commentText, date) VALUES (?,?,?,?)"
+	query := "INSERT INTO comments (photoID, authorID, commentText, date) VALUES (?,?,?,?);"
 
 	sqlResult, err := db.c.Exec(query, comment.PhotoID, comment.AuthorID, comment.Text, comment.Date)
 	if err != nil {
@@ -17,7 +17,7 @@ func (db *appdbimpl) CommentPhoto(comment Comment) (dbComment Comment, err error
 
 func (db *appdbimpl) UncommentPhoto(ID uint64) (err error) {
 	
-	query := "DELETE FROM comments WHERE commentID = ?"
+	query := "DELETE FROM comments WHERE commentID = ?;"
 
 	_, err = db.c.Exec(query, ID)
 	return
@@ -46,7 +46,7 @@ func (db *appdbimpl) RemoveCommentsBothDirections(user1ID uint64, user2ID uint64
 	query := `
 		DELETE FROM comments WHERE 
 		photoID IN (SELECT photoID FROM photos WHERE authorID = ?) 
-		AND  authorID = ?`
+		AND  authorID = ?;`
 
 	_, err = db.c.Exec(query, user1ID, user2ID)
     if err != nil {

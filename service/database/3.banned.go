@@ -2,7 +2,7 @@ package database
 
 func (db *appdbimpl) BanUser(bannerID uint64, bannedID uint64) (err error) {
 
-	query := "INSERT INTO banned (bannerID, bannedID) VALUES (?,?)"
+	query := "INSERT INTO banned (bannerID, bannedID) VALUES (?,?);"
 
 	_, err = db.c.Exec(query, bannerID, bannedID)
 	return err
@@ -10,7 +10,7 @@ func (db *appdbimpl) BanUser(bannerID uint64, bannedID uint64) (err error) {
 
 func (db *appdbimpl) UnbanUser(bannerID uint64, bannedID uint64) (err error) {
 
-	query := "DELETE FROM banned WHERE (bannerID = ? AND bannedID = ?)"
+	query := "DELETE FROM banned WHERE (bannerID = ? AND bannedID = ?);"
 
 	_, err = db.c.Exec(query, bannerID, bannedID)
 	return err

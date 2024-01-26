@@ -3,10 +3,10 @@ package database
 func (db *appdbimpl) GetUserProfile(ID uint64) (dbProfile Profile, err error) {
 
 	queries := [4]string{
-		"SELECT username FROM users WHERE userID = ?",
-		"SELECT COUNT(*) FROM photos WHERE authorID = ?",
-		"SELECT COUNT(*) FROM following WHERE followedID = ?",
-		"SELECT COUNT(*) FROM following WHERE followerID = ?",
+		"SELECT username FROM users WHERE userID = ?;",
+		"SELECT COUNT(*) FROM photos WHERE authorID = ?;",
+		"SELECT COUNT(*) FROM following WHERE followedID = ?;",
+		"SELECT COUNT(*) FROM following WHERE followerID = ?;",
 	}
 
 	err = db.c.QueryRow(queries[0], ID).Scan(&dbProfile.Username)
@@ -96,6 +96,84 @@ func (db *appdbimpl) GetFollowingsList(followerID uint64) (followingsList []User
 			return
 		}
 		followingsList = append(followingsList, user)
+	}
+
+	err = rows.Err()
+	return
+}
+
+func (db *appdbimpl) GetLikesList(photoID uint64) (likesList []User, err error) {
+
+	query := "SELECT likerID FROM likes WHERE photoID = ?;"
+
+	rows, err := db.c.Query(query, photoID)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var user User
+		err = rows.Scan(&user.ID)
+		if err != nil {
+			return
+		}
+		user, _, err = db.SearchUserByID(user.ID)
+		if err != nil {
+			return
+		}
+		likesList = append(likesList, user)
+	}
+
+	err = rows.Err()
+	return
+}
+
+func (db *appdbimpl) GetCommentsList(photoID uint64) (commentsList []Comment, err error) {
+
+	query := "SELECT * FROM comments WHERE photoID = ?;"
+
+	rows, err := db.c.Query(query, photoID)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var comment Comment
+		err = rows.Scan(&comment.ID, &comment.PhotoID, &comment.AuthorID, &comment.Text, &comment.Date)
+		if err != nil {
+			return
+		}
+		commentsList = append(commentsList, comment)
+	}
+
+	err = rows.Err()
+	return
+}
+
+func (db *appdbimpl) GetMyStream(requestingUserID uint64) (stream []Photo, err error) {
+
+	query := `
+		SELECT * FROM photos
+		INNER JOIN following ON authorID = followedID
+		WHERE followerID = ?
+		ORDER BY date DESC
+		LIMIT 50;`
+
+	rows, err := db.c.Query(query, requestingUserID)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var photo Photo
+		err = rows.Scan(&photo.ID, &photo.AuthorID, &photo.Format, &photo.Date)
+		if err != nil {
+			return
+		}
+		stream = append(stream, photo)
 	}
 
 	err = rows.Err()

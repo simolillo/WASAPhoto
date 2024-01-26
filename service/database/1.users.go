@@ -4,7 +4,7 @@ import "database/sql"
 
 func (db *appdbimpl) CreateUser(username string) (dbUser User, err error) {
 
-	query := "INSERT INTO users (username) VALUES (?)"
+	query := "INSERT INTO users (username) VALUES (?);"
 
 	sqlResult, err := db.c.Exec(query, username)
 	if err != nil {
@@ -18,7 +18,7 @@ func (db *appdbimpl) CreateUser(username string) (dbUser User, err error) {
 
 func (db *appdbimpl) UpdateUsername(dbUser User) (err error) {
 
-	query := "UPDATE users SET username = ? WHERE userID = ?"
+	query := "UPDATE users SET username = ? WHERE userID = ?;"
 
 	_, err = db.c.Exec(query, dbUser.Name, dbUser.ID)
 	return

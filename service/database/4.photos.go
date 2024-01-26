@@ -4,7 +4,7 @@ import "database/sql"
 
 func (db *appdbimpl) CreatePhoto(photo Photo) (dbPhoto Photo, err error) {
 
-	query := "INSERT INTO photos (authorID, format, date) VALUES (?,?,?)"
+	query := "INSERT INTO photos (authorID, format, date) VALUES (?,?,?);"
 
 	sqlResult, err := db.c.Exec(query, photo.AuthorID, photo.Format, photo.Date)
 	if err != nil {
@@ -18,7 +18,7 @@ func (db *appdbimpl) CreatePhoto(photo Photo) (dbPhoto Photo, err error) {
 
 func (db *appdbimpl) DeletePhoto(ID uint64) (err error) {
 
-	query := "DELETE FROM photos WHERE photoID = ?"
+	query := "DELETE FROM photos WHERE photoID = ?;"
 
 	_, err = db.c.Exec(query, ID)
 	return err
