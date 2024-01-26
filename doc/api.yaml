@@ -1,0 +1,831 @@
+openapi: 3.0.0
+info:
+  title: WASAPhoto
+  description: >-
+    Keep in touch with your friends
+    by sharing photos of special moments,
+    thanks to WASAPhoto!
+
+    You can upload your photos directly from your PC,
+    and they will be visible to everyone following you.
+  version: 0.0.1
+
+tags:
+  - name: session
+    description: All operations related to user sessions.
+  - name: settings
+    description: All operations related to user settings.
+  - name: following
+    description: All operations related to following other users.
+  - name: banned
+    description: All operations related to managing banned users.
+  - name: photos
+    description: All operations related to photos.
+  - name: likes
+    description: All operations related to photo likes.
+  - name: comments
+    description: All operations related to photo comments.
+  - name: getters
+    description: All operations related to retrieving user and photo information.
+
+components:
+
+  schemas:
+
+    UserID:
+      description: UserID.
+      readOnly: true
+      type: number
+      format: uint64
+      example: 1
+
+    PhotoID:
+      description: PhotoID.
+      readOnly: true
+      type: number
+      format: uint64
+      example: 1
+
+    CommentID:
+      description: CommentID.
+      readOnly: true
+      type: number
+      format: uint64
+      example: 1
+
+    Username:
+      description: Username.
+      type: string
+      pattern: '^.*?$'
+      minLength: 3
+      maxLength: 16
+      example: Maria
+
+    User:
+      description: User object.
+      type: object
+      properties:
+        userID:
+          $ref: '#/components/schemas/UserID'
+        username:
+          $ref: '#/components/schemas/Username'
+
+    Date:
+      description: Publish date.
+      type: string
+      format: date-time
+      minLength: 19
+      maxLength: 19
+      example: '2006-01-02 15:04:05'
+
+    Photo:
+      description: Photo object.
+      type: object
+      properties:
+        photoID:
+          $ref: '#/components/schemas/PhotoID'
+        authorID:
+          $ref: '#/components/schemas/UserID'
+        format:
+          description: Photo format.
+          type: string
+          enum:
+            - png
+            - jpg
+          pattern: '^.*?$'
+          minLength: 3
+          maxLength: 3
+          example: png
+        date:
+          $ref: '#/components/schemas/Date'
+
+    CommentText:
+          description: Comment text.
+          type: string
+          pattern: '^.*?$'
+          minLength: 1
+          maxLength: 2200
+          example: Amazing photo!
+
+    Comment:
+      description: Comment object.
+      type: object
+      properties:
+        commentID:
+          $ref: '#/components/schemas/CommentID'
+        photoID:
+          $ref: '#/components/schemas/PhotoID'
+        authorID:
+          $ref: '#/components/schemas/UserID'
+        commentText:
+          $ref: '#/components/schemas/CommentText'
+        date:
+          $ref: '#/components/schemas/Date'
+
+    Profile:
+      description: Profile object.
+      type: object
+      properties:
+        username:
+          $ref: '#/components/schemas/Username'
+        photosCount:
+          description: Total number of photos.
+          type: number
+          format: uint64
+          example: 53
+        followersCount:
+          description: Total number of followers.
+          type: number
+          format: uint64
+          example: 53
+        followingCount:
+          description: Total number of following.
+          type: number
+          format: uint64
+          example: 53
+        isFollowedByViewer:
+          description: Is followed by viewer.
+          type: boolean
+          example: true
+
+    BinaryImage:
+      description: Binary image.
+      type: string
+      format: binary
+      minLength: 4
+      maxLength: 65535
+      example: iVBORw0KGgoAAAANSU...
+
+
+  parameters:
+
+    UserID:
+      name: uid
+      in: path
+      required: true
+      description: UserID.
+      schema:
+        $ref: '#/components/schemas/UserID'
+
+    PhotoID:
+      name: pid
+      in: path
+      required: true
+      description: PhotoID.
+      schema:
+        $ref: '#/components/schemas/PhotoID'
+    
+    CommentID:
+      name: cid
+      in: path
+      required: true
+      description: CommentID.
+      schema:
+        $ref: '#/components/schemas/CommentID'
+
+
+  responses:
+
+    Unauthorized:
+      # 401
+      description: The client must authenticate.
+
+    Forbidden:
+      # 403
+      description: Some user has banned the other.
+
+    InternalServerError:
+      #500
+      description: Server error.
+
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+
+security:
+  - bearerAuth: []
+
+
+paths:
+
+  /session:
+
+    post:
+      operationId: doLogin
+      tags: [session]
+      security: []
+      summary: logs in the user
+      description: |-
+        The login endpoint accepts a username like “Maria” without any password.
+        If the user does not exist, it will be created and returned.
+        If the user exists, it will be returned.
+      requestBody:
+        description: Username.
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/User' }
+      responses:
+        "200":
+          # OK
+          description: |-
+            User log-in action successful.
+            User returned in the content.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        "201":
+          # Created
+          description: |-
+            User sign-up action successful.
+            User created and returned in the content.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        "400":
+          # Bad Request
+          description: |-
+            Invalid JSON object or;
+            invalid username.
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /settings:
+
+    put:
+      operationId: setMyUserName
+      tags: [settings]
+      summary: update username
+      description: Update username.
+      requestBody:
+        description: Updated username.
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/User' }
+      responses:
+        "200":
+          # OK
+          description: |-
+            Username successfully updated.
+            The updated user is returned in the content.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        "400":
+          # Bad Request
+          description: |-
+            Invalid JSON object or;
+            invalid username.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /following/{uid}:
+
+    parameters:
+      - $ref: '#/components/parameters/UserID'
+
+    put:
+      operationId: followUser
+      tags: [following]
+      summary: start following a user
+      description: Start following a user.
+      responses:
+        "204":
+          # No Content
+          description: User started followin other user.
+        "400":
+          # Bad Request
+          description: |-
+            Invalid path parameter uid or;
+            uid not matching any existing user or;
+            user trying to follow himself or;
+            user already following.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      operationId: unfollowUser
+      tags: [following]
+      summary: unfollow a user
+      description: Unfollow a user.
+      responses:
+        "204":
+          # No Content
+          description: User unfollowed other user.
+        "400":
+          # Bad Request
+          description: |-
+            Invalid path parameter uid or;
+            uid not matching any existing user.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /banned/{uid}:
+
+    parameters:
+      - $ref: '#/components/parameters/UserID'
+
+    put:
+      operationId: banUser
+      tags: [banned]
+      summary: ban a user
+      description: Ban a user.
+      responses:
+        "204":
+          # No Content
+          description: User banned other user.
+        "400":
+          # Bad Request
+          description: |-
+            Invalid path parameter uid or;
+            uid not matching any existing user or;
+            user trying to ban himself or;
+            user already banned.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      operationId: unbanUser
+      tags: [banned]
+      summary: unban a user
+      description: Unban a user.
+      responses:
+        "204":
+          # No Content
+          description: User unbanned other user.
+        "400":
+          # Bad Request
+          description: |-
+            Invalid path parameter uid or;
+            uid not matching any existing user.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /photos/:
+
+    post:
+      operationId: uploadPhoto
+      tags: [photos]
+      summary: upload a new photo
+      description: upload a new photo
+      requestBody:
+        description: Binary image.
+        required: true
+        content:
+          image/*:
+            schema: { $ref: '#/components/schemas/BinaryImage' }
+      responses:
+        "201":
+          # Created
+          description: Photo successfully uploaded.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Photo' }
+        "400":
+          # Bad Request
+          description: >
+            Invalid binary data or;
+            binary data not png/jpg.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /photos/{pid}/:
+
+    parameters:
+      - $ref: '#/components/parameters/PhotoID'
+
+    delete:
+      operationId: deletePhoto
+      tags: [photos]
+      summary: delete a photo
+      description: Delete previously uploaded photo.
+      responses:
+        "204":
+          # No Content
+          description: User deleted photo.
+        "400":
+          # Bad Request
+          description: |-
+            Invalid path parameter pid or;
+            pid not matching any existing photo.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          # Forbidden
+          description: Requesting user not author of photo.
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+    get:
+      operationId: getPhoto
+      tags: [getters]
+      summary: get binary image
+      description: Get binary image.
+      responses:
+        "200":
+          # OK
+          description: Photo details retrieved successfully.
+          content:
+            image/*:
+              schema: { $ref: '#/components/schemas/BinaryImage' }
+        "400":
+          # Bad Request
+          description: |-
+            Invalid path parameter pid or;
+            pid not matching any existing photo.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+
+
+  /likes/{pid}:
+
+    parameters:
+      - $ref: '#/components/parameters/PhotoID'
+
+    put:
+      operationId: likePhoto
+      tags: [likes]
+      summary: put a like to a photo
+      description: Put a like to a photo.
+      responses:
+        "204":
+          # No Content
+          description: The like has been put to the specified photo.
+        "400":
+          # Bad Request
+          description: |-
+            Invalid path parameter pid or;
+            pid not matching any existing photo.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+
+      operationId: unlikePhoto
+      tags: [likes]
+      summary: unlike a photo
+      description: Unlike photo.
+      responses:
+        "204":
+          # No Content
+          description: The like has been removed from the specified photo.
+        "400":
+          # Bad Request
+          description: |-
+            Invalid path parameter pid or;
+            pid not matching any existing photo.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /photos/{pid}/comments/:
+
+    parameters:
+      - $ref: '#/components/parameters/PhotoID'
+
+    post:
+      operationId: commentPhoto
+      tags: [comments]
+      summary: comment on a photo
+      description: Comment on a photo.
+      requestBody:
+        description: Comment text.
+        required: true
+        content:
+          text/plain:
+            schema: { $ref: '#/components/schemas/CommentText' }
+      responses:
+        "201":
+          # Created
+          description: Comment successfully added to the specified photo.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Comment' }
+        "400":
+          # Bad Request
+          description: |-
+            Invalid path parameter pid or;
+            pid not matching any existing photo or;
+            invalid comment data.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+    get:
+      operationId: getCommentsList
+      tags: [getters]
+      summary: get photo comments
+      description: Get the list of comments for a specific photo.
+      responses:
+        "200":
+          # OK
+          description: List of photo comments retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Comment' }
+        "400":
+          # Bad Request
+          description: |-
+            Invalid path parameter pid or;
+            pid not matching any existing photo.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /photos/{pid}/comments/{cid}:
+
+    parameters:
+      - $ref: '#/components/parameters/PhotoID'
+      - $ref: '#/components/parameters/CommentID'
+
+    delete:
+      operationId: uncommentPhoto
+      tags: [comments]
+      summary: remove a comment from a photo
+      description: Remove a comment from a photo.
+      responses:
+        "204":
+          # No Content
+          description: Comment successfully removed from the specified photo.
+        "400":
+          # Bad Request
+          description: |-
+            Invalid path parameter pid or;
+            pid not matching any existing photo or;
+            invalid path parameter cid or;
+            cid not matching any existing comment.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          # Forbidden
+          description: Requesting user not author of comment.
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /users/{uid}/:
+
+    parameters:
+      - $ref: '#/components/parameters/UserID'
+
+    get:
+      operationId: getUserProfile
+      tags: [getters]
+      summary: get user profile
+      description: Get user profile by user ID.
+      responses:
+        "200":
+          # OK
+          description: User profile retrieved successfully.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Profile' }
+        "400":
+          # Bad Request
+          description: |-
+            Invalid path parameter uid or;
+            uid not matching any existing user.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /users/{uid}/photos/:
+
+    parameters:
+      - $ref: '#/components/parameters/UserID'
+
+    get:
+      operationId: getPhotosList
+      tags: [getters]
+      summary: get user photos
+      description: Get the list of photos uploaded by a user.
+      responses:
+        "200":
+          # OK
+          description: List of user photos retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Photo' }
+        "400":
+          # Bad Request
+          description: |-
+            Invalid path parameter uid or;
+            uid not matching any existing user.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /users/{uid}/followers/:
+
+    parameters:
+      - $ref: '#/components/parameters/UserID'
+
+    get:
+      operationId: getFollowersList
+      tags: [getters]
+      summary: get user followers
+      description: Get the list of followers for a user.
+      responses:
+        "200":
+          # OK
+          description: List of user followers retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/User' }
+        "400":
+          # Bad Request
+          description: |-
+            Invalid path parameter uid or;
+            uid not matching any existing user.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /users/{uid}/followings/:
+
+    parameters:
+      - $ref: '#/components/parameters/UserID'
+
+    get:
+      operationId: getFollowingsList
+      tags: [getters]
+      summary: get user followings
+      description: Get the list of users that a user is following.
+      responses:
+        "200":
+          # OK
+          description: List of user followings retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/User' }
+        "400":
+          # Bad Request
+          description: |-
+            Invalid path parameter uid or;
+            uid not matching any existing user.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /photos/{pid}/likes/:
+
+    parameters:
+      - $ref: '#/components/parameters/PhotoID'
+
+    get:
+      operationId: getLikesList
+      tags: [getters]
+      summary: get photo likes
+      description: Get the list of users who liked a specific photo.
+      responses:
+        "200":
+          # OK
+          description: List of photo likes retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/User' }
+        "400":
+          # Bad Request
+          description: |-
+            Invalid path parameter pid or;
+            pid not matching any existing photo.
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          # Forbidden
+          $ref: '#/components/responses/Forbidden'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /stream:
+
+    get:
+      operationId: getMyStream
+      tags: [getters]
+      summary: get user stream
+      description: Get the stream of photos and activities for the authenticated user.
+      responses:
+        "200":
+          # OK
+          description: User stream retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Photo' }
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'

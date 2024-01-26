@@ -70,8 +70,11 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	// serving photo
 	fsPhoto := fs.Photo(photo)
 	photoPath := fsPhoto.Path()
+	
+	// serving photo
+	w.Header().Set("Content-Type", "image/*")
+	w.WriteHeader(http.StatusOK)
 	http.ServeFile(w, r, photoPath)
 }
