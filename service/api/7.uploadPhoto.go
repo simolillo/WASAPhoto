@@ -67,7 +67,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	photo := Photo{
 		AuthorID: author.ID,
 		Format: format,
-		Date: time.Now(),
+		Date: time.Now().Format("2006-01-02 15:04:05"),
 	}
 
 	// database section

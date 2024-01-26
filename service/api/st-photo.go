@@ -3,14 +3,13 @@ package api
 import (
 	"github.com/simolillo/WASAPhoto/service/fileSystem"
 	"github.com/simolillo/WASAPhoto/service/database"
-	"time"
 )
 
 type Photo struct {
 	ID uint64       `json:"photoID"`
 	AuthorID uint64 `json:"authorID"`
 	Format string   `json:"format"`
-	Date time.Time  `json:"date"`
+	Date string     `json:"date"`
 }
 
 func (p *Photo) ToDatabase() database.Photo {

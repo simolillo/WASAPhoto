@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/simolillo/WASAPhoto/service/database"
-	"time"
 )
 
 type Comment struct {
@@ -10,7 +9,7 @@ type Comment struct {
 	PhotoID uint64  `json:"photoID"`
 	AuthorID uint64 `json:"authorID"`
 	Text string     `json:"commentText"`
-	Date time.Time  `json:"date"`
+	Date string     `json:"date"`
 }
 
 func (c *Comment) ToDatabase() database.Comment {

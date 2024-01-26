@@ -85,7 +85,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		PhotoID: photo.ID,
 		AuthorID: author.ID,
 		Text: commentText,
-		Date: time.Now(),
+		Date: time.Now().Format("2006-01-02 15:04:05"),
 	}
 
 	// database section
