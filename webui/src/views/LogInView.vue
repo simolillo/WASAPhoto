@@ -1,87 +1,77 @@
 <script>
 export default {
-	data: function() {
-		return {
-			errormsg: null,
-			user: {
-                ID: 0,
-                Name: "",                
+    data: function () {
+        return {
+            error: false,
+            loading: false,
+            some_data: null,
+        }
+    },
+    methods: {
+        async initialize() {
+
+            this.$user_state.current_view = this.$views.LOGIN;
+            this.$user_state.username = null;
+
+        },
+        async login() {
+
+            let username = document.getElementById("login-form").value;
+
+            // check username regex
+
+            if (!username.match("^[a-zA-Z][a-zA-Z0-9_]{2,32}$")) {
+                alert("Invalid username, must respect RegEx: ^[a-zA-Z][a-zA-Z0-9_]{2,32}$ (3 - 32 characters, first character must be a letter, only letters, numbers and underscores allowed)");
+                return;
             }
-		}
-	},
-	methods: {
-		async login() {
-			this.errormsg = null;
-			try {
-				let response = await this.$axios.post("/session",{username: this.user.Name});
-                this.user = response.data;
-                sessionStorage.setItem('token', this.user.ID)
-				this.$router.replace("/home")
-				this.$emit('updatedLoggedChild',true)
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-		},
-	},
-	mounted(){
-		if (sessionStorage.getItem('token')){
-			this.$router.replace("/home")
-		}
-	},
-	
+
+
+            let response = await this.$axios.put("/session", {
+                "username-string": username
+            });
+
+            //check if the response is 201
+
+            if (response.status == 201) {
+                this.error = false;
+                this.$user_state.username = username
+                this.$user_state.headers.Authorization = response.data["token"]["hash"]
+                this.$router.push("/stream/" + username);
+            } else {
+                this.error = true;
+            }
+        }
+    },
+    mounted() {
+        this.initialize()
+    }
 }
 </script>
 
 <template>
-	<div class="container-fluid h-100 m-0 p-0 login">
+    <div class="container text-center pt-3 pb-2 border-bottom">
+        <h2>Login</h2>
+    </div>
 
-		<div class="row ">
-			<div class="col">
-				<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
-			</div>
-		</div>
 
-		<div class="row h-100 w-100 m-0">
-			
-			<form @submit.prevent="login" class="d-flex flex-column align-items-center justify-content-center p-0">
+    <div class="h-75 d-flex align-items-center justify-content-center">
+        <form class="border border-dark p-5 rounded shadow-lg">
+            <!-- Username input -->
+            <div class="form-outline mb-4">
+                <input type="text" id="login-form" class="form-control" pattern="^[a-zA-Z][a-zA-Z0-9_]{2,32}$" />
+                <label class="form-label" for="login-form">Username</label>
+            </div>
 
-				<div class="row mt-2 mb-3 border-bottom">
-					<div class="col">
-						<h2 class="login-title">WASAPhoto Login</h2>
-					</div>
-				</div>
+            <!-- Submit button -->
+            <button type="button" class="btn btn-primary btn-block mb-4" @click="login()">Sign in</button>
 
-				<div class="row mt-2 mb-3">
-					<div class="col">
-						<input 
-						type="text" 
-						class="form-control" 
-						v-model="username" 
-						maxlength="16"
-						minlength="3"
-						placeholder="Your identifier" />
-					</div>
-				</div>
+        </form>
 
-				<div class="row mt-2 mb-5 ">
-					<div class="col ">
-						<button class="btn btn-dark" :disabled="username == null || username.length >16 || username.length <3 || username.trim().length<3"> 
-						Register/Login 
-						</button>
-					</div>
-				</div>
-			</form>
-		</div>
-	</div>
+    </div>
+
+
 </template>
 
 <style>
-.login {
-    background-image: url("../assets/images/BackgroundLogin.jpg");
-    height: 100vh;
-}
 
-.login-title {
-    color: black;
-}
 </style>
