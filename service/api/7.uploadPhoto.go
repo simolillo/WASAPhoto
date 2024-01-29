@@ -44,6 +44,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	binaryData, err := io.ReadAll(r.Body)
+	_ = r.Body.Close()
 	
 	// BadRequest check
 	if err != nil {

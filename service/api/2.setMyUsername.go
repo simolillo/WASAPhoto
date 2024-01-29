@@ -43,6 +43,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	var updatedUser User
 	updatedUser.FromDatabase(dbUser)
 	err = json.NewDecoder(r.Body).Decode(&updatedUser)
+	_ = r.Body.Close()
 
 	// BadRequest check
 	if err != nil {

@@ -20,6 +20,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	var user User
 	err := json.NewDecoder(r.Body).Decode(&user)
+	_ = r.Body.Close()
 
 	// BadRequest check
 	if err != nil {
