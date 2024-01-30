@@ -10,6 +10,7 @@ import './assets/main.css'
 
 const app = createApp(App)
 app.config.globalProperties.$axios = axios;
+axios.defaults.headers.common['Authorization'] = localStorage.getItem('token');
 app.component("ErrorMsg", ErrorMsg);
 app.component("LoadingSpinner", LoadingSpinner);
 app.use(router)
