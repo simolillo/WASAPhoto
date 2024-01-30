@@ -73,13 +73,13 @@ export default {}
 
 		<div class="h-75 d-flex align-items-center justify-content-center">
 			<form class="border border-dark p-5 rounded shadow-lg" @submit.prevent="login">
-				<!-- Username input -->
-				<div class="form-outline mb-4">
-					<input type="text" id="login-form" class="form-control" pattern="^[a-zA-Z][a-zA-Z0-9_]{2,32}$" />
-					<label class="form-label" for="login-form">Username</label>
-				</div>
-				<!-- Submit button -->
-				<button type="submit" class="btn btn-primary btn-block mb-4">Sign in</button>
+            <!-- Username input -->
+            <div class="form-outline mb-4">
+                <input type="text" id="login-form" class="form-control" pattern="^[a-zA-Z][a-zA-Z0-9_]{2,32}$" />
+                <label class="form-label" for="login-form">Username</label>
+            </div>
+            <!-- Submit button -->
+            <button type="button" class="btn btn-primary btn-block mb-4" @click="login()">Sign in</button>
 			</form>
 		</div>
 	</div>
