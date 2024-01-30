@@ -33,7 +33,7 @@ export default {
         },
 	},
 	mounted() {
-		this.refresh()
+		this.login()
 	}
 }
 </script>
