@@ -74,6 +74,7 @@ export default {}
 			</div>
 		</div>
 	</div>
+
 	<div v-else>
 		<!-- login page -->
 		<div class="container text-center pt-3 pb-2 border-bottom">
