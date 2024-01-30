@@ -2,23 +2,35 @@
 export default {
 	data: function() {
 		return {
-			errormsg: null,
-			loading: false,
-			some_data: null,
+            errormsg: null,
+			user: {
+                ID: 0,
+                Name: "",
+            },
 		}
 	},
 	methods: {
-		async refresh() {
-			this.loading = true;
-			this.errormsg = null;
-			try {
-				let response = await this.$axios.get("/");
-				this.some_data = response.data;
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-			this.loading = false;
-		},
+		async login() {
+            this.errormsg = null;
+            try {
+                let username = document.getElementById("login-form").value;
+                if (!username.match("^[a-zA-Z][a-zA-Z0-9_]{2,32}$")) {
+                    alert("Invalid username. First character must be a letter, only letters, numbers and underscores allowed.");
+                    return;
+                }
+
+                let response = await this.$axios.post("/session", {
+                    "username": this.user.Name
+                });
+                this.user = response.data;
+
+                localStorage.setItem("token", this.user.ID);
+                localStorage.setItem("username", this.user.Name);
+                this.$router.replace("/stream");
+            } catch (e) {
+                this.errormsg = e.toString();
+            }
+        },
 	},
 	mounted() {
 		this.refresh()
@@ -44,5 +56,4 @@ export default {
     </div>
 </template>
 
-<style>
-</style>
+<style></style>

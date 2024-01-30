@@ -30,7 +30,7 @@ export default {
             } catch (e) {
                 this.errormsg = e.toString();
             }
-        }
+        },
 	},
 	mounted() {
         if (localStorage.getItem("token")){
