@@ -4,30 +4,35 @@ export default {
 		return {
 			errormsg: null,
 			loading: false,
-			username: null,
-			profile: {
-				userId: 0,
-				username: "",
-			},
+			otheruser: null,
+			userId: localStorage.getItem("token"),
 		};
 	},
 	methods: {
-		createUser: async function () {
+		async findUser() {
 			this.loading = true;
 			this.errormsg = null;
 			try {
-				const response = await this.$axios.post("/session/", {
-					username: this.username,
+				let url = `/profile/${this.otheruser}/`;
+				let response = await this.$axios.get(url, {
+					headers: {
+						Authorization:
+							"Bearer " + localStorage.getItem("token"),
+					},
 				});
-				this.profile = response.data;
-				localStorage.setItem("token", this.profile.id);
-				localStorage.setItem("username", this.profile.username);
-				await this.$router.push({
+				this.$router.push({
 					name: "MyAccount",
-					params: { username: this.username },
+					params: { username: this.otheruser },
 				});
 			} catch (e) {
-				this.errormsg = e.toString();
+				if (e.response.status == 401) {
+					this.errormsg = "You can not acces " + this.otheruser;
+				} else if (e.response.status == 404) {
+					// this.$router.push({ name: "Login" });
+					this.errormsg = "User not found " + this.otheruser;
+				} else {
+					this.errormsg = e.toString();
+				}
 			}
 			this.loading = false;
 		},
@@ -42,30 +47,34 @@ export default {
 				<div class="col-md-6">
 					<div class="card bg-white text-dark rounded-3">
 						<div class="card-body p-5 text-center">
-							<h2 class="fw-bold mb-4 text-uppercase">Welcome</h2>
+							<h2 class="fw-bold mb-4 text-uppercase">
+								Search User
+							</h2>
 							<p class="text-muted">
-								Please enter your username.
+								Please enter the username of the user that you
+								are searching for.
 							</p>
 							<div class="form-group">
 								<input
 									type="text"
-									id="username"
+									id="otheruser"
 									class="form-control form-control-lg rounded-pill mb-3"
-									v-model="username"
+									v-model="otheruser"
 									placeholder="Username"
 									required
 									minlength="3"
 									maxlength="16"
 								/>
 							</div>
-							<div class="d-grid gap-3" @click="createUser">
+							<div class="d-grid gap-3">
 								<button
 									v-if="!loading"
 									class="btn btn-primary rounded-pill"
 									type="submit"
+									@click="findUser"
 									style="background-color: #2e4a78"
 								>
-									Login
+									Search User
 								</button>
 								<LoadingSpinner v-if="loading" />
 							</div>
@@ -74,7 +83,7 @@ export default {
 				</div>
 			</div>
 		</div>
-		<ErrorMsg v-if="errormsg" :msg="errormsg" />
+		<ErrorMsg class="error-container" v-if="errormsg" :msg="errormsg" />
 	</div>
 </template>
 

@@ -1,41 +1,60 @@
 <script>
+import "../styles.css";
+
 export default {
-	data: function() {
+	data: function () {
 		return {
 			errormsg: null,
 			loading: false,
+			userId: localStorage.getItem("token"),
 			photos: [],
 			likes: {},
 			comments: {},
 			userLikes: {},
 			newComment: null,
-		}
+		};
 	},
 	methods: {
-		async loadStream() {
-            this.errormsg = null
-			try {
-				let response = await this.$axios.get("/stream", {headers: {'Authorization': localStorage.getItem("token")}});
-                this.photos = response.data
-				
-			} catch (e) {
-				this.errormsg = e.toString()
-			}
+		load() {
+			return load;
 		},
-        async refresh() {
+		requirePhoto(path) {
+			return `../src/assets/images/${path}`;
+		},
+		async refresh() {
 			this.loading = true;
 			this.errormsg = null;
 			try {
-				let response = await this.$axios.get("/stream", {headers: {'Authorization': localStorage.getItem("token")}});
+				let apiUrl = `/users/${this.userId}/stream/`;
+				let response = await this.$axios.get(apiUrl, {
+					headers: {
+						Authorization:
+							"Bearer " + localStorage.getItem("token"),
+					},
+				});
 				this.photos = response.data;
-
 				for (const photo of this.photos) {
-					const commentsResponse = await this.$axios.get(`/photos/${photo.ID}/comments/`, {headers: {'Authorizaiton': localStorage.getItem("token")}});
+					const commentsResponse = await this.$axios.get(
+						`/photos/${photo.id}/comments/`,
+						{
+							headers: {
+								Authorization:
+									"Bearer " + localStorage.getItem("token"),
+							},
+						}
+					);
 					this.comments[photo.id] = commentsResponse.data;
-
-					const likesResponse = await this.$axios.get(`/photos/${photo.ID}/likes/`, {headers: {'Authorization': localStorage.getItem("token")}});
-					this.likes[photo.id] = likesResponse.data;
-                    this.userLikes[photo.id] = likesResponse.data
+					const likesResponse = await this.$axios.get(
+						`/photos/${photo.id}/likes/${photo.userId}/`,
+						{
+							headers: {
+								Authorization:
+									"Bearer " + localStorage.getItem("token"),
+							},
+						}
+					);
+					this.likes[photo.id] = likesResponse.data.length;
+					this.userLikes[photo.id] = likesResponse.data
 						.map((p) => p.userId)
 						.includes(parseInt(this.userId));
 				}
@@ -44,15 +63,32 @@ export default {
 			}
 			this.loading = false;
 		},
-        async likePhoto(photoId) {
+		async likePhoto(photoId, id) {
 			this.loading = true;
 			this.errormsg = null;
 			try {
 				if (this.userLikes[photoId]) {
-					await this.$axios.delete(`/likes/${photoId}`, {headers: {'Authorization': localStorage.getItem("token")}});
+					await this.$axios.delete(
+						`/photos/${photoId}/likes/${id}/`,
+						{
+							headers: {
+								Authorization:
+									"Bearer " + localStorage.getItem("token"),
+							},
+						}
+					);
 					this.userLikes[photoId] = false;
 				} else {
-					await this.$axios.put(`/likes/${photoId}`, {headers: {'Authorization': localStorage.getItem("token")}});
+					await this.$axios.put(
+						`/photos/${photoId}/likes/${id}/`,
+						{},
+						{
+							headers: {
+								Authorization:
+									"Bearer " + localStorage.getItem("token"),
+							},
+						}
+					);
 					this.userLikes[photoId] = true;
 				}
 				await this.refresh();
@@ -61,34 +97,59 @@ export default {
 			}
 			this.loading = false;
 		},
-        async addComment(photoId) {
-            this.loading = true;
-            this.errormsg = null;
-            try {
-                await this.$axios.post(`/photos/${photoId}/comments/`, this.newComment, {headers: {'Authorization': localStorage.getItem("token")}});
-                await this.refresh();
-                this.newComment = "";
-            } catch (e) {
-                this.errormsg = e.toString();
-            }
-            this.loading = false;
-        },
-        async deleteComment(photoId, commentId) {
+		async deleteComment(photoId, commentId) {
 			this.loading = true;
 			this.errormsg = null;
 			try {
-				await this.$axios.delete(`/photos/${photoId}/comments/${commentId}/`, {headers: {'Authorization': localStorage.getItem("token")}});
+				await this.$axios.delete(
+					`/photos/${photoId}/comments/${commentId}/`,
+					{
+						headers: {
+							Authorization:
+								"Bearer " + localStorage.getItem("token"),
+						},
+					}
+				);
 				await this.refresh();
 			} catch (e) {
 				this.errormsg = e.toString();
 			}
 			this.loading = false;
 		},
+		addComment: async function (photoId) {
+			this.loading = true;
+			this.errormsg = null;
+			try {
+				await this.$axios.post(
+					`/photos/${photoId}/comments/`,
+					{
+						userId: parseInt(this.userId),
+						comment: this.newComment,
+					},
+					{
+						headers: {
+							Authorization:
+								"Bearer " + localStorage.getItem("token"),
+						},
+					}
+				);
+				await this.refresh();
+				this.newComment = "";
+			} catch (e) {
+				if (e.response.status == 400) {
+					this.errormsg = "Wrong format received " + this.newComment;
+				} else {
+					this.errormsg = e.toString();
+				}
+			}
+			this.loading = false;
+		},
 	},
+
 	mounted() {
 		this.refresh();
-	}
-}
+	},
+};
 </script>
 
 <template>

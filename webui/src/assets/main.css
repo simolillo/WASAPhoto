@@ -14,7 +14,7 @@
 
 .b-example-divider {
 	height: 3rem;
-	background-color: rgba(0 0 0 / 10%);
+	background-color: rgba(22, 47, 116, 0.1);
 	border: solid rgba(0 0 0 / 15%);
 	border-width: 1px 0;
 	box-shadow: inset 0 0.5em 1.5em rgba(0 0 0 / 10%), inset 0 0.125em 0.5em rgba(0 0 0 / 15%);
