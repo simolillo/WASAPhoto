@@ -34,12 +34,12 @@ export default {
 	computed:{
         // Ottiene l'ID dell'utente dal percorso corrente.
         currentPath(){
-            return this.$route.params.id
+            return this.$route.params.uid
         },
         
         // Controlla se l'utente visualizzato è lo stesso che ha effettuato l'accesso.
 		sameUser(){
-			return this.$route.params.id === sessionStorage.getItem('token')
+			return this.$route.params.uid === sessionStorage.getItem('token')
 		},
 	},
 
@@ -79,10 +79,10 @@ export default {
 		async followClick(){
             try{
                 if (this.followStatus){ 
-                    await this.$axios.delete("/following/"+this.$route.params.id);
+                    await this.$axios.delete("/following/"+this.$route.params.uid);
                     this.followerCnt -=1
                 }else{
-                    await this.$axios.put("/following/"+this.$route.params.id);
+                    await this.$axios.put("/following/"+this.$route.params.uid);
                     this.followerCnt +=1
                 }
                 this.followStatus = !this.followStatus
@@ -95,10 +95,10 @@ export default {
 		async banClick(){
             try{
                 if (this.banStatus){
-                    await this.$axios.delete("/banned/"+this.$route.params.id);
+                    await this.$axios.delete("/banned/"+this.$route.params.uid);
                     this.loadInfo()
                 }else{
-                    await this.$axios.put("/banned/"+this.$route.params.id);
+                    await this.$axios.put("/banned/"+this.$route.params.uid);
                     this.followStatus = false
                 }
                 this.banStatus = !this.banStatus
@@ -106,15 +106,59 @@ export default {
                 this.errormsg = e.toString();
             }
 		},
+        async followersList(uid) {
+			try {
+				this.errormsg = null
+				let response = await this.$axios.get("/users/" + uid + "/followers/")
 
+				if (response.data != null){
+					return response.data
+				}
+
+				return [];
+			} catch (e) {
+				this.errormsg = e.toString()
+				return [];
+			}
+		},
+        async followingsList(uid) {
+			try {
+				this.errormsg = null
+				let response = await this.$axios.get("/users/" + uid + "/followings/")
+
+				if (response.data != null){
+					return response.data
+				}
+
+				return [];
+			} catch (e) {
+				this.errormsg = e.toString()
+				return [];
+			}
+		},
+        async photosList(uid) {
+			try {
+				this.errormsg = null
+				let response = await this.$axios.get("/users/" + uid + "/photos/")
+
+				if (response.data != null){
+					return response.data
+				}
+
+				return [];
+			} catch (e) {
+				this.errormsg = e.toString()
+				return [];
+			}
+		},
 		async loadInfo(){
-            if (this.$route.params.id === undefined){
+            if (this.$route.params.uid === undefined){
                 return
             }
 
 			try{
                 // Get user profile: /users/:id
-				let response = await this.$axios.get("/users/"+this.$route.params.id);
+				let response = await this.$axios.get("/users/"+this.$route.params.uid);
 
                 this.banStatus = false
                 this.userExists = true
@@ -133,10 +177,10 @@ export default {
 				this.followerCnt = response.data.FollowersCount
 				this.followingCnt = response.data.FollowingCount
 				this.postCnt = response.data.PhotosCount
-				this.followStatus = response.data.followers != null ? response.data.followers.find(obj => obj.user_id === sessionStorage.getItem('token')) : false
-                this.photos = response.data.posts != null ? response.data.posts : []
-                this.followers = response.data.followers != null ? response.data.followers : []
-                this.following = response.data.following != null ? response.data.following : []
+				this.followStatus = response.data.IsFollowedByViewer
+                this.photos = this.photosList(this.$route.params.uid)
+                this.followers = this.followersList(this.$route.params.uid)
+                this.following = this.followingsList(this.$route.params.uid)
 
 			}catch(e){
 				this.currentIsBanned = true
@@ -144,12 +188,42 @@ export default {
 		},
 
         goToSettings(){
-            this.$router.push(this.$route.params.id+'/settings')
+            this.$router.push('/settings')
         },
 
         removePhotoFromList(photo_id){
 			this.photos = this.photos.filter(item => item.photo_id !== photo_id)
 		},
+        async commentsList(pid) {
+			try {
+				this.errormsg = null
+				let response = await this.$axios.get("/photos/" + pid + "/comments/")
+
+				if (response.data != null){
+					return response.data
+				}
+
+				return [];
+			} catch (e) {
+				this.errormsg = e.toString()
+				return [];
+			}
+		},
+		async likesList(pid) {
+			try {
+				this.errormsg = null
+				let response = await this.$axios.get("/photos/" + pid + "/likes/")
+
+				if (response.data != null){
+					return response.data
+				}
+
+				return [];
+			} catch (e) {
+				this.errormsg = e.toString()
+				return [];
+			}
+		}
 	},
     // Carica le informazioni del profilo quando il componente viene montato.
 	async mounted(){
@@ -170,7 +244,7 @@ export default {
                     <div class="row">
                         <div class="col">
                             <div class="card-body d-flex justify-content-between align-items-center">
-                                <h5 class="card-title p-0 me-auto mt-auto">{{nickname}} @{{this.$route.params.id}}</h5>
+                                <h5 class="card-title p-0 me-auto mt-auto">{{nickname}} @{{this.$route.params.uid}}</h5>
 
                                 <button v-if="!sameUser && !banStatus" @click="followClick" class="btn btn-success ms-2">
                                     {{followStatus ? "Unfollow" : "Follow"}}
@@ -234,10 +308,10 @@ export default {
                 <div v-if="!banStatus && postCnt>0">
                     <Photo v-for="(photo,index) in photos" 
                     :key="index" 
-                    :owner="this.$route.params.id" 
-                    :photo_id="photo.photo_id" 
-                    :comments="photo.comments" 
-                    :likes="photo.likes" 
+                    :owner="photo.authorID" 
+                    :photo_id="photo.photoID" 
+                    :comments="commentsList(photo.photoID)" 
+                    :likes="likesList(photo.photoID)" 
                     :upload_date="photo.date" 
                     :isOwner="sameUser" 
                     
