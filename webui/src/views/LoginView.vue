@@ -19,12 +19,17 @@ export default {
                     return;
                 }
 
+                console.log("arrivato qui1")
+
                 let response = await this.$axios.post("/session", {"username": username}, {headers: {'Content-Type': 'application/json'}});
                 this.user = response.data;
+
+                console.log("arrivato qui2")
 
                 localStorage.setItem("token", this.user.ID);
                 localStorage.setItem("username", this.user.Name);
                 this.$router.replace("/stream");
+                console.log("arrivato qui3")
             } catch (e) {
                 this.errormsg = e.toString();
             }
