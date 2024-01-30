@@ -33,7 +33,7 @@ export default {
         },
 	},
 	mounted() {
-        if (localStorage.getItem("token")){
+		if (localStorage.getItem("token")){
 			this.$router.replace("/stream")
 		}
 	}
