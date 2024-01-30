@@ -1,50 +1,42 @@
 <script>
 export default {
-    data: function () {
-        return {
-            error: false,
-            loading: false,
-            some_data: null,
-        }
-    },
-    methods: {
-        async initialize() {
+	data: function() {
+		return {
+            errormsg: null,
+			user: {
+                ID: 0,
+                Name: "",
+            },
+		}
+	},
+	methods: {
+		async login() {
+            this.errormsg = null;
+            try {
+                let username = document.getElementById("login-form").value;
+                if (!username.match("^[a-zA-Z][a-zA-Z0-9_]{2,32}$")) {
+                    alert("Invalid username. First character must be a letter, only letters, numbers and underscores allowed.");
+                    return;
+                }
 
-            this.$user_state.current_view = this.$views.LOGIN;
-            this.$user_state.username = null;
+                let response = await this.$axios.post("/session", {
+                    "username": this.user.Name
+                });
+                this.user = response.data;
 
-        },
-        async login() {
-
-            let username = document.getElementById("login-form").value;
-
-            // check username regex
-
-            if (!username.match("^[a-zA-Z][a-zA-Z0-9_]{2,32}$")) {
-                alert("Invalid username, must respect RegEx: ^[a-zA-Z][a-zA-Z0-9_]{2,32}$ (3 - 32 characters, first character must be a letter, only letters, numbers and underscores allowed)");
-                return;
-            }
-
-
-            let response = await this.$axios.put("/session", {
-                "username-string": username
-            });
-
-            //check if the response is 201
-
-            if (response.status == 201) {
-                this.error = false;
-                this.$user_state.username = username
-                this.$user_state.headers.Authorization = response.data["token"]["hash"]
-                this.$router.push("/stream/" + username);
-            } else {
-                this.error = true;
+                localStorage.setItem("token", this.user.ID);
+                localStorage.setItem("username", this.user.Name);
+                this.$router.replace("/stream");
+            } catch (e) {
+                this.errormsg = e.toString();
             }
         }
-    },
-    mounted() {
-        this.initialize()
-    }
+	},
+	mounted() {
+        if (localStorage.getItem("token")){
+			this.$router.replace("/stream")
+		}
+	}
 }
 </script>
 
@@ -53,25 +45,17 @@ export default {
         <h2>Login</h2>
     </div>
 
-
     <div class="h-75 d-flex align-items-center justify-content-center">
-        <form class="border border-dark p-5 rounded shadow-lg">
+        <form class="border border-dark p-5 rounded shadow-lg" @submit.prevent="login">
             <!-- Username input -->
             <div class="form-outline mb-4">
                 <input type="text" id="login-form" class="form-control" pattern="^[a-zA-Z][a-zA-Z0-9_]{2,32}$" />
                 <label class="form-label" for="login-form">Username</label>
             </div>
-
             <!-- Submit button -->
-            <button type="button" class="btn btn-primary btn-block mb-4" @click="login()">Sign in</button>
-
+            <button type="submit" class="btn btn-primary btn-block mb-4">Sign in</button>
         </form>
-
     </div>
-
-
 </template>
 
-<style>
-
-</style>
+<style></style>

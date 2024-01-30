@@ -12,20 +12,6 @@
 	}
 }
 
-html,
-body {
-	height: 100%;
-	background-image: url("wallpaper.png");
-	background-position: fixed;
-	background-repeat: no-repeat;
-	background-size: cover;
-	background-attachment: fixed;
-}
-
-body {
-	padding-top: 75px;
-}
-
 .b-example-divider {
 	height: 3rem;
 	background-color: rgba(0 0 0 / 10%);
@@ -64,18 +50,11 @@ body {
 }
 
 .feather {
-	/*	width: 24px;
+/*	width: 24px;
 	height: 24px;*/
 	stroke: currentColor;
 	stroke-width: 2;
 	stroke-linecap: round;
 	stroke-linejoin: round;
 	fill: none;
-}
-
-@media (min-width: 768px) {
-	.feather {
-		width: 32px;
-		height: 32px;
-	}
 }
