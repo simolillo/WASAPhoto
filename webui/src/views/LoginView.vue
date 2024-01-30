@@ -46,7 +46,7 @@ export default {
     </div>
 
     <div class="h-75 d-flex align-items-center justify-content-center">
-        <form class="border border-dark p-5 rounded shadow-lg" @submit.prevent="login"> -->
+        <form class="border border-dark p-5 rounded shadow-lg" @submit.prevent="login">
             <!-- Username input -->
             <div class="form-outline mb-4">
                 <input type="text" id="login-form" class="form-control" pattern="^[a-zA-Z][a-zA-Z0-9_]{2,32}$" />
