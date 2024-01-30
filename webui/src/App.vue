@@ -35,9 +35,9 @@ export default {}
 							</RouterLink>
 						</li>
 						<li class="nav-item">
-							<RouterLink to="/login" class="nav-link">
+							<RouterLink to="/link2" class="nav-link">
 								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#key"/></svg>
-								Login
+								Menu item 2
 							</RouterLink>
 						</li>
 					</ul>
