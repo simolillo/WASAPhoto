@@ -34,12 +34,12 @@ export default {
 	computed:{
         // Ottiene l'ID dell'utente dal percorso corrente.
         currentPath(){
-            return this.$route.params.uid
+            return this.$route.params.id
         },
         
         // Controlla se l'utente visualizzato è lo stesso che ha effettuato l'accesso.
 		sameUser(){
-			return this.$route.params.uid === sessionStorage.getItem('token')
+			return this.$route.params.id === sessionStorage.getItem('token')
 		},
 	},
 
@@ -79,10 +79,10 @@ export default {
 		async followClick(){
             try{
                 if (this.followStatus){ 
-                    await this.$axios.delete("/following/"+this.$route.params.uid);
+                    await this.$axios.delete("/following/"+this.$route.params.id);
                     this.followerCnt -=1
                 }else{
-                    await this.$axios.put("/following/"+this.$route.params.uid);
+                    await this.$axios.put("/following/"+this.$route.params.id);
                     this.followerCnt +=1
                 }
                 this.followStatus = !this.followStatus
@@ -95,10 +95,10 @@ export default {
 		async banClick(){
             try{
                 if (this.banStatus){
-                    await this.$axios.delete("/banned/"+this.$route.params.uid);
+                    await this.$axios.delete("/banned/"+this.$route.params.id);
                     this.loadInfo()
                 }else{
-                    await this.$axios.put("/banned/"+this.$route.params.uid);
+                    await this.$axios.put("/banned/"+this.$route.params.id);
                     this.followStatus = false
                 }
                 this.banStatus = !this.banStatus
@@ -158,7 +158,7 @@ export default {
 
 			try{
                 // Get user profile: /users/:id
-				let response = await this.$axios.get("/users/"+this.$route.params.uid);
+				let response = await this.$axios.get("/users/"+this.$route.params.id);
 
                 this.banStatus = false
                 this.userExists = true
@@ -178,9 +178,9 @@ export default {
 				this.followingCnt = response.data.FollowingCount
 				this.postCnt = response.data.PhotosCount
 				this.followStatus = response.data.IsFollowedByViewer
-                this.photos = this.photosList(this.$route.params.uid)
-                this.followers = this.followersList(this.$route.params.uid)
-                this.following = this.followingsList(this.$route.params.uid)
+                this.photos = this.photosList(this.$route.params.id)
+                this.followers = this.followersList(this.$route.params.id)
+                this.following = this.followingsList(this.$route.params.id)
 
 			}catch(e){
 				this.currentIsBanned = true

@@ -4,7 +4,6 @@ export default {
 		return {
 			errormsg: null,
 			photos: [],
-			likes: [],
 		}
 	},
 	methods: {
