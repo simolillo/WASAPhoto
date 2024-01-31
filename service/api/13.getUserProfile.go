@@ -54,7 +54,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 	if !present {
 		stringErr := "getUserProfile: path parameter uid not matching any existing user"
-		http.Error(w, stringErr, http.StatusNotFound)
+		http.Error(w, stringErr, http.StatusBadRequest)
 		return
 	}
 
@@ -66,7 +66,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 	if someoneIsBanned {
 		stringErr := "getUserProfile: someone has banned the other"
-		http.Error(w, stringErr, http.StatusPartialContent)
+		http.Error(w, stringErr, http.StatusForbidden)
 		return
 	}
 

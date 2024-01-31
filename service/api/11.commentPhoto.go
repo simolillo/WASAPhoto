@@ -75,7 +75,6 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	body, err := io.ReadAll(r.Body)
-	_ = r.Body.Close()
 	if err != nil {
 		stringErr := "commentPhoto: invalid request body"
 		http.Error(w, stringErr, http.StatusBadRequest)
