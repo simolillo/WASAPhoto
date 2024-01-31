@@ -169,7 +169,7 @@ export default {
                     return
                 }
 
-				if (response.status === 204){
+				if (response.status === 404){
 					this.userExists = false
 				}
 				
