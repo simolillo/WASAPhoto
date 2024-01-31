@@ -1,85 +1,61 @@
 <script>
 export default {
-	data: function() {
-		return {
-			errormsg: null,
-			username: "",
-			disabled: true,
-		}
-	},
-	methods: {
-		async login() {
-			this.errormsg = null;
-			try {
-				let response = await this.$axios.post("/session",{username: this.username.trim()});
-				sessionStorage.setItem('token',response.data.userID);
-				this.$router.replace("/home")
-				// informs that user has logged in 
-				this.$emit('updatedLoggedChild',true)
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-		},
-	},
-	mounted(){
-		if (sessionStorage.getItem('token')){
-			this.$router.replace("/home")
-		}
-	},
-	
-}
+data() {
+    return {
+    username: "",
+    errormsg: null,
+    loading: false,
+    };
+},
+methods: {
+    async login() {
+    this.loading = true;
+    this.errormsg = null;
+
+    try {
+        // Assuming you have a doLogin method in your API
+        let response = await this.$axios.post("/session", {
+        username: this.username,
+        });
+
+        // Assuming the response contains user data
+        let userData = response.data.user;
+
+        // Do something with the user data (e.g., store in Vuex)
+        console.log("User ID:", userData.userID);
+        console.log("Username:", userData.username);
+
+        // Redirect to home page or perform other actions as needed
+        // Example: this.$router.push("/home");
+    } catch (e) {
+        this.errormsg = e.toString();
+    }
+
+    this.loading = false;
+    },
+},
+};
 </script>
 
 <template>
-	<div class="container-fluid h-100 m-0 p-0 login">
-
-		<div class="row ">
-			<div class="col">
-				<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
-			</div>
-		</div>
-
-		<div class="row h-100 w-100 m-0">
-			
-			<form @submit.prevent="login" class="d-flex flex-column align-items-center justify-content-center p-0">
-
-				<div class="row mt-2 mb-3 border-bottom">
-					<div class="col">
-						<h2 class="login-title">WASAPhoto Login</h2>
-					</div>
-				</div>
-
-				<div class="row mt-2 mb-3">
-					<div class="col">
-						<input 
-						type="text" 
-						class="form-control" 
-						v-model="username" 
-						maxlength="16"
-						minlength="3"
-						placeholder="Your identifier" />
-					</div>
-				</div>
-
-				<div class="row mt-2 mb-5 ">
-					<div class="col ">
-						<button class="btn btn-dark" :disabled="username == null || username.length >16 || username.length <3 || username.trim().length<3"> 
-						Register/Login 
-						</button>
-					</div>
-				</div>
-			</form>
-		</div>
-	</div>
-</template>
-
-<style>
-.login {
-    background-image: url("../assets/images/BackgroundLogin.jpeg");
-    height: 100vh;
-}
-
-.login-title {
-    color: white;
-}
-</style>
+    <div>
+      <h1 class="h2">Login</h1>
+  
+      <form @submit.prevent="login">
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input type="text" class="form-control" v-model="username" required>
+        </div>
+  
+        <button type="submit" class="btn btn-primary">Login</button>
+      </form>
+  
+      <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
+    </div>
+  </template>
+  
+  
+  <style>
+  /* Add any styling if needed */
+  </style>
+  

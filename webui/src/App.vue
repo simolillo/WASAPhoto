@@ -1,81 +1,64 @@
 <script setup>
-// layout principale dell'applicazione
-// importo Routerlink,Routerview per la gestione delle vie. 
-// RouterView è un contenitore per il componente corrispondente alla via corrente.
 import { RouterLink, RouterView } from 'vue-router'
 </script>
 <script>
-export default {
-	data(){
-		return{
-			// indica se l'utente è attualmente autenticato.
-			logged: false,
-			searchValue: "",
-		}
-	},
-	methods:{
-		logout(newValue){
-			// Imposta logged su false e reindirizza l'utente alla pagina di login.
-			this.logged = newValue
-			this.$router.replace("/login")
-		},
-		updateLogged(newLogged){
-			// Aggiorna lo stato logged con il nuovo valore.
-			this.logged = newLogged
-		},
-		updateView(newRoute){
-			// Reindirizza l'utente alla nuova via specificata.
-			this.$router.replace(newRoute)
-		},
-		search(queryParam){
-			// mposta il valore di searchValue e reindirizza l'utente alla pagina di ricerca.
-			this.searchValue= queryParam
-			this.$router.replace("/search")
-		},
-	},
-
-	
-	created(){
-		// Quando il componente viene creato, controlla se esiste un elemento notFirstStart
-		// nel sessionStorage. Se non esiste, pulisce il sessionStorage e imposta notFirstStart su true.
-		if (!sessionStorage.getItem('notFirstStart')){
-			sessionStorage.clear()
-			sessionStorage.setItem('notFirstStart',true)
-			// console.log("first start")
-		}
-		
-	},
-	
-
-	mounted(){
-
-		// controlla se esiste un token nel sessionStorage
-		// Se esiste, imposta logged su true, altrimenti reindirizza l'utente alla pagina di login.
-		if (!sessionStorage.getItem('token')){
-			this.$router.replace("/login")
-		}else{
-			this.logged = true
-		}
-	},
-}
+export default {}
 </script>
 
 <template>
+
+	<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+		<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#/">Example App</a>
+		<button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+	</header>
+
 	<div class="container-fluid">
 		<div class="row">
-			<div class="col p-0">
-				<main >
-					<Navbar v-if="logged" 
-					@logoutNavbar="logout" 
-					@requestUpdateView="updateView"
-					@searchNavbar="search"/>
+			<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+				<div class="position-sticky pt-3 sidebar-sticky">
+					<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
+						<span>General</span>
+					</h6>
+					<ul class="nav flex-column">
+						<li class="nav-item">
+							<RouterLink to="/" class="nav-link">
+								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#home"/></svg>
+								Home
+							</RouterLink>
+						</li>
+						<li class="nav-item">
+							<RouterLink to="/link1" class="nav-link">
+								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#layout"/></svg>
+								Menu item 1
+							</RouterLink>
+						</li>
+						<li class="nav-item">
+							<RouterLink to="/link2" class="nav-link">
+								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#key"/></svg>
+								Menu item 2
+							</RouterLink>
+						</li>
+					</ul>
 
-					<RouterView 
-					@updatedLoggedChild="updateLogged" 
-					@requestUpdateView="updateView"
-					:searchValue="searchValue"/>
-				</main>
-			</div>
+					<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
+						<span>Secondary menu</span>
+					</h6>
+					<ul class="nav flex-column">
+						<li class="nav-item">
+							<RouterLink :to="'/some/' + 'variable_here' + '/path'" class="nav-link">
+								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#file-text"/></svg>
+								Item 1
+							</RouterLink>
+						</li>
+					</ul>
+				</div>
+			</nav>
+
+			<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+				<RouterView />
+			</main>
 		</div>
 	</div>
 </template>
