@@ -33,7 +33,7 @@ export default {
 			}
 			try {
 				// Search user (PUT):  "/users"
-				let response = await this.$axios.get("/users",{
+				let response = await this.$axios.get("/usersu",{
 						params: {
 						username: this.searchValue,
 					},
