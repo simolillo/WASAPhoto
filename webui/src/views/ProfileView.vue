@@ -1,8 +1,20 @@
 <script>
 // update username
 export default {
+	data: function() {
+		return {
+			username: "",
+            photosCount: 0,
+            followersCount: 0,
+            followingCount: 0,
+            isItMe: false,
+            doIFollowUser: false,
+            isInMyBannedList: false,
+            amIBanned: false,
+		}
+	},
     methods: {
-        async setMyUsername() {
+        async getUserProfile() {
             try {
 				// PUT /settings
 				let username = document.getElementById('username').value;
@@ -21,6 +33,9 @@ export default {
         		alert(`Status (${status}): ${errorMessage}`);
             }
         }
+    },
+    mounted() {
+        this.finishedMounted = true;
     }
 }
 </script>
@@ -46,7 +61,7 @@ export default {
                                 </button>
 
                                 <button v-else class="my-trnsp-btn ms-2" @click="goToSettings">
-                                    <!--Settings  <font-awesome-icon icon="fa-solid fa-gear" />-->
+                     
                                     <i class="my-nav-icon-gear fa-solid fa-gear"></i>
                                 </button>
                             </div>
