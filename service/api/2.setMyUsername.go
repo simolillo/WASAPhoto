@@ -55,6 +55,16 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 		http.Error(w, stringErr, http.StatusBadRequest)
 		return
 	}
+	_, present, err = rt.db.SearchUserByUsername(updatedUser.Name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if present {
+		stringErr := "setMyUserName: username already exists"
+		http.Error(w, stringErr, http.StatusBadRequest)
+		return
+	}
 
 	// database section
 	err = rt.db.UpdateUsername(updatedUser.ToDatabase())

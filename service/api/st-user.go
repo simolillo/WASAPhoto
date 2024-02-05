@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/simolillo/WASAPhoto/service/database"
 	"strings"
+	"regexp"
 )
 
 type User struct {
@@ -16,6 +17,10 @@ func (u *User) HasValidUsername() bool {
 		return false
 	}
 	if len(username) < 3 || len(username) > 16 {
+		return false
+	}
+	match, _ := regexp.MatchString("^[a-zA-Z][a-zA-Z0-9_]{2,15}$", username)
+	if !match {
 		return false
 	}
 	return true
