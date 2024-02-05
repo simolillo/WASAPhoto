@@ -151,7 +151,7 @@ func createDatabase(db *sql.DB) error {
 		`CREATE TABLE IF NOT EXISTS likes (
 			likerID INTEGER NOT NULL REFERENCES users (userID),
 			photoID INTEGER NOT NULL REFERENCES photos (photoID),
-			PRIMARY KEY (userID, photoID)
+			PRIMARY KEY (likerID, photoID)
 			);`,
 		`CREATE TABLE IF NOT EXISTS comments (
 			commentID INTEGER NOT NULL PRIMARY KEY,
