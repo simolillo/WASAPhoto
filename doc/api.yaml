@@ -27,6 +27,8 @@ tags:
     description: All operations related to photo comments.
   - name: getters
     description: All operations related to retrieving user and photo information.
+  - name: search
+    description: All operations related to searching users.
 
 components:
 
@@ -832,6 +834,38 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/Photo' }
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+  
+
+  /users/:
+
+    get:
+      operationId: searchUserByUsername
+      tags: [search]
+      summary: search a user
+      description: >-
+        Search a user by providing a username (might be partial).
+        A list of users partially matching the provided username is returned.
+      parameters:
+        - name: username
+          in: query
+          required: true
+          description: Username (might be partial).
+          schema: { $ref: '#/components/schemas/Username' }
+      responses:
+        "200":
+          # OK
+          description: List of matching users retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/User' }
         "401":
           # Unauthorized
           $ref: '#/components/responses/Unauthorized'

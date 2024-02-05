@@ -9,12 +9,11 @@ curl -v \
 */
 
 import (
+	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
+	"github.com/julienschmidt/httprouter"
 	"encoding/json"
 	"net/http"
 	"strconv"
-
-	"github.com/julienschmidt/httprouter"
-	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 )
 
 func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

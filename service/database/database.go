@@ -89,6 +89,9 @@ type AppDatabase interface {
 	GetCommentsList(photoID uint64) (commentsList []Comment, err error)
 	GetMyStream(requestingUserID uint64) (stream []Photo, err error)
 
+	// Search
+	SearchUser(usernameToSearch string) (usersList []User, err error)
+
 	Ping() error
 }
 
