@@ -21,9 +21,12 @@ type Comment struct {
 }
 
 type Profile struct {
-	Username           string `json:"username"`
-	PhotosCount        uint64 `json:"PhotosCount"`
-	FollowersCount     uint64 `json:"FollowersCount"`
-	FollowingCount     uint64 `json:"FollowingCount"`
-	IsFollowedByViewer bool   `json:"IsFollowedByViewer"`
+	Username         string `json:"username"`
+	PhotosCount      uint64 `json:"photosCount"`
+	FollowersCount   uint64 `json:"followersCount"`
+	FollowingCount   uint64 `json:"followingCount"`
+	IsItMe           bool   `json:"isItMe"`
+	DoIFollowUser    bool   `json:"doIFollowUser"`
+	IsInMyBannedList bool   `json:"isInMyBannedList"`
+	AmIBanned        bool   `json:"amIBanned"`
 }

@@ -20,10 +20,7 @@ func (u *User) HasValidUsername() bool {
 		return false
 	}
 	match, _ := regexp.MatchString("^[a-zA-Z][a-zA-Z0-9_]{2,15}$", username)
-	if !match {
-		return false
-	}
-	return true
+	return match
 }
 
 func (u *User) ToDatabase() database.User {

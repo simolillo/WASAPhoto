@@ -143,8 +143,20 @@ components:
           type: number
           format: uint64
           example: 53
-        isFollowedByViewer:
-          description: Is followed by viewer.
+        isItMe:
+          description: Is it me.
+          type: boolean
+          example: true
+        doIFollowUser:
+          description: Do I follow user.
+          type: boolean
+          example: true
+        isInMyBannedList:
+          description: Is in my banned list.
+          type: boolean
+          example: true
+        amIBanned:
+          description: Am I banned.
           type: boolean
           example: true
 
@@ -659,9 +671,6 @@ paths:
         "401":
           # Unauthorized
           $ref: '#/components/responses/Unauthorized'
-        "403":
-          # Forbidden
-          $ref: '#/components/responses/Forbidden'
         "500":
           # Internal Server Error
           $ref: '#/components/responses/InternalServerError'

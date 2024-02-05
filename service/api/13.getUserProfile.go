@@ -9,11 +9,12 @@ curl -v \
 */
 
 import (
-	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
-	"github.com/julienschmidt/httprouter"
 	"encoding/json"
 	"net/http"
 	"strconv"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 )
 
 func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -58,30 +59,35 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	// Forbidden check
-	someoneIsBanned, err := rt.db.CheckBanBothDirections(requestingUser.ID, requestedUser.ID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if someoneIsBanned {
-		stringErr := "getUserProfile: someone has banned the other"
-		http.Error(w, stringErr, http.StatusForbidden)
-		return
-	}
-
 	var requestedProfile Profile
+	if requestingUser.ID == requestedUser.ID {
+		requestedProfile.IsItMe = true
+	} else {
+		requestedProfile.IsItMe = false
+	}
 	isFollowing, err := rt.db.CheckFollow(requestingUser.ID, requestedUser.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
+	requestedProfile.DoIFollowUser = isFollowing
+	isBanned, err := rt.db.CheckBan(requestingUser.ID, requestedUser.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	requestedProfile.IsInMyBannedList = isBanned
+	isBanned, err = rt.db.CheckBan(requestedUser.ID, requestingUser.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	requestedProfile.AmIBanned = isBanned
+	
 	// database section
 	dbProfile, err := rt.db.GetUserProfile(requestedUser.ID)
 	requestedProfile.FromDatabase(dbProfile)
-	requestedProfile.IsFollowedByViewer = isFollowing
-
+		
 	// InternalServerError check
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
