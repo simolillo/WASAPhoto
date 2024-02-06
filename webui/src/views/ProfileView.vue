@@ -59,41 +59,42 @@ export default {
         		alert(`Status (${status}): ${errorMessage}`);
             }
         },
-		// async followBtn() {
-        //     try {
-        //         if (this.doIFollowUser) { 
-        //             // DELETE /following/{1}
-        //             await this.$axios.delete(`/following/${userID}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
-        //             this.followersCount -=1
-        //         } else {
-        //             // PUT /following/{1}
-        //             await this.$axios.put(`/following/${userID}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
-        //             this.followersCount +=1
-        //         }
-        //         this.doIFollowUser = !this.followStatus
-        //     } catch (error) {
-        //         const status = error.response.status;
-        // 		const errorMessage = error.response.data;
-        // 		alert(`Status (${status}): ${errorMessage}`);
-        //     }
-		// },
-        // async banBtn() {
-        //     try {
-        //         if (this.isInMyBannedList) {
-        //             // DELETE /banned/{1}
-        //             await this.$axios.delete(`/banned/${userID}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
-        //             this.getUserProfile();
-        //         } else {
-        //             // PUT /banned/{1}
-        //             await this.$axios.put(`/banned/${userID}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
-        //             this.getUserProfile();
-        //         }
-        //     } catch (error) {
-        //         const status = error.response.status;
-        // 		const errorMessage = error.response.data;
-        // 		alert(`Status (${status}): ${errorMessage}`);
-        //     }
-		// },
+		async followBtn() {
+            try {
+                console.log(localStorage.getItem('token'))
+                if (this.doIFollowUser) { 
+                     // DELETE /following/{1}
+                    await this.$axios.delete(`/following/${this.userID}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
+                    this.followersCount -=1
+                } else {
+                    // PUT /following/{1}
+                    await this.$axios.put(`/following/${this.userID}`, null, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
+                    this.followersCount +=1
+                }
+                this.doIFollowUser = !this.doIFollowUser
+            } catch (error) {
+                const status = error.response.status;
+        		const errorMessage = error.response.data;
+        		alert(`Status (${status}): ${errorMessage}`);
+            }
+		},
+        async banBtn() {
+            try {
+                if (this.isInMyBannedList) {
+                     // DELETE /banned/{1}
+                    await this.$axios.delete(`/banned/${this.userID}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
+                    this.getUserProfile();
+                } else {
+                    // PUT /banned/{1}
+                    await this.$axios.put(`/banned/${this.userID}`, null, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
+                    this.getUserProfile();
+                }
+            } catch (error) {
+                const status = error.response.status;
+        		const errorMessage = error.response.data;
+        		alert(`Status (${status}): ${errorMessage}`);
+            }
+		},
     },
     mounted() {
         this.getUserProfile();
@@ -103,7 +104,7 @@ export default {
 
 <template>
 
-    <div class="container-fluid" v-if="userExists">
+    <div class="container-fluid" v-if="userExists && !amIBanned">
         <div class="row">
             <div class="col-12 d-flex justify-content-center">
                 <div class="card w-50 container-fluid">

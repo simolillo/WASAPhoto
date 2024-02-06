@@ -3,6 +3,11 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 <script>
 export default {
+	data: function() {
+		return {
+			profilePath: "",
+		}
+	},
 	methods: {
 		// login
 		async doLogin() {
@@ -17,6 +22,7 @@ export default {
 				let user = response.data // userID, username
 				localStorage.setItem('token', user.userID);
 				localStorage.setItem('username', user.username);
+				this.profilePath = `/profiles/${user.username}`; // update personal profile path
 				this.$router.replace('/home');
 			} catch (error) {
 				const status = error.response.status;
@@ -25,14 +31,6 @@ export default {
 			}
 		}
 	},
-	computed: {
-		// profilePath
-		profilePath() {
-			let username = localStorage.getItem('username');
-			console.log("HAHAHAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHAAHHAHHAHAHAHHAHAHAHHAHAHAHHAHAHAHA")
-			return `/profiles/${username}`;
-		}
-	}
 }
 </script>
 
