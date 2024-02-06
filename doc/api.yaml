@@ -197,6 +197,14 @@ components:
       schema:
         $ref: '#/components/schemas/CommentID'
 
+    Username:
+      name: username
+      in: path
+      required: true
+      description: Username.
+      schema:
+        $ref: '#/components/schemas/Username'
+
 
   responses:
 
@@ -834,6 +842,36 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/Photo' }
+        "401":
+          # Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        "500":
+          # Internal Server Error
+          $ref: '#/components/responses/InternalServerError'
+    
+
+  /user/{username}:
+
+    parameters:
+      - $ref: '#/components/parameters/Username'
+
+    get:
+      operationId: getUserId
+      tags: [getters]
+      summary: get user ID
+      description: Get user ID by specifying username.
+      responses:
+        "200":
+          # OK
+          description: User ID retrieved successfully.
+          content:
+            text/plain:
+              schema: { $ref: '#/components/schemas/UserID' }
+        "400":
+          # Bad Request
+          description: |-
+            Invalid path parameter username or;
+            username not matching any existing user.
         "401":
           # Unauthorized
           $ref: '#/components/responses/Unauthorized'

@@ -44,6 +44,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET("/photos/:pid/likes/", rt.wrap(rt.getLikesList))
 	rt.router.GET("/photos/:pid/comments/", rt.wrap(rt.getCommentsList))
 	rt.router.GET("/stream", rt.wrap(rt.getMyStream))
+	rt.router.GET("/user/:username", rt.wrap(rt.getUserId))
 
 	// Search
 	rt.router.GET("/users/", rt.wrap(rt.searchUserByUsername))

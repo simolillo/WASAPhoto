@@ -5,7 +5,7 @@ go run ./cmd/webapi/
 curl -v \
 	-X POST \
 	-H 'Content-Type: application/json' \
-	-d '{"username": "Sim"}' \
+	-d '{"username": "Simo"}' \
 	localhost:3000/session
 */
 

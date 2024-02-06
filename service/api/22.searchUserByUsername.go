@@ -23,7 +23,7 @@ func (rt *_router) searchUserByUsername(w http.ResponseWriter, r *http.Request, 
 
 	// Unauthorized check
 	if err != nil {
-		stringErr := "getUserProfile: invalid authorization token"
+		stringErr := "searchUserByUsername: invalid authorization token"
 		http.Error(w, stringErr, http.StatusUnauthorized)
 		return
 	}
@@ -33,7 +33,7 @@ func (rt *_router) searchUserByUsername(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 	if !present {
-		stringErr := "getUserProfile: authorization token not matching any existing user"
+		stringErr := "searchUserByUsername: authorization token not matching any existing user"
 		http.Error(w, stringErr, http.StatusUnauthorized)
 		return
 	}
