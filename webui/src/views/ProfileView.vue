@@ -1,5 +1,5 @@
 <script>
-// update username
+// get user profile
 export default {
 	data: function() {
 		return {
@@ -16,13 +16,10 @@ export default {
     methods: {
         async getUserProfile() {
             try {
-				// PUT /settings
-				let username = document.getElementById('username').value;
-				if (!username.match("^[a-zA-Z][a-zA-Z0-9_]{2,15}$")) {
-                alert("Invalid username: 3 - 16 characters; first character must be a letter; only letters, numbers and underscores allowed");
-                return;
-				}
-				let response = await this.$axios.put('/settings', {username: username}, {headers: {'Authorization': `${localStorage.getItem('token')}`, 'Content-Type': 'application/json'}});
+                // profiles/username
+				// GET /users/?username="Maria"
+                let username = this.$route.params.username;
+				let response = await this.$axios.get('/users/', {params: {username: username}}, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
 				let user = response.data // userID, username
 				localStorage.setItem('token', user.userID);
 				localStorage.setItem('username', user.username);
