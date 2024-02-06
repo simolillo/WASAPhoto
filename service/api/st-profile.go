@@ -31,8 +31,8 @@ func (p *Profile) FromDatabase(profile database.Profile) {
 	p.PhotosCount = profile.PhotosCount
 	p.FollowersCount = profile.FollowersCount
 	p.FollowingCount = profile.FollowingCount
-	p.IsItMe = profile.IsItMe
-	p.DoIFollowUser = profile.DoIFollowUser
-	p.IsInMyBannedList = profile.IsInMyBannedList
-	p.AmIBanned = profile.AmIBanned
+	// p.IsItMe = profile.IsItMe
+	// p.DoIFollowUser = profile.DoIFollowUser
+	// p.IsInMyBannedList = profile.IsInMyBannedList
+	// p.AmIBanned = profile.AmIBanned
 }
