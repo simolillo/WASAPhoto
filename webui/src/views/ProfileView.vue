@@ -19,12 +19,12 @@ export default {
                 // profiles/username
 				// GET /user/{Simo}
                 let username = this.$route.params.username;
-				let response = await this.$axios.get(`/user/{${username}}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
-				alert('qui arrivo')
+				let response = await this.$axios.get(`/user/${username}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
                 let userID = response.data;
                 // GET /users/{1}/
                 response = await this.$axios.get(`/users/${userID}/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
-				let profile = response.data;
+                let profile = response.data;
+                console.log(profile)
                 this.username = profile.username;
                 this.photosCount = profile.photosCount;
                 this.followersCount = profile.followersCount;
