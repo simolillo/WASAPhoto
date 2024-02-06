@@ -2,9 +2,9 @@
 import { RouterLink, RouterView } from 'vue-router'
 </script>
 <script>
-// login
 export default {
 	methods: {
+		// login
 		async doLogin() {
 			try {
 				// POST /session
@@ -23,6 +23,13 @@ export default {
         		const errorMessage = error.response.data;
         		alert(`Status (${status}): ${errorMessage}`);
 			}
+		}
+	},
+	computed: {
+		// profilePath
+		profilePath() {
+			const username = localStorage.getItem('username');
+			return `/profiles/${username}`;
 		}
 	}
 }
@@ -65,7 +72,7 @@ export default {
 								</RouterLink>
 							</li>
 							<li class="nav-item">
-								<RouterLink to="/personal-profile" class="nav-link">
+								<RouterLink :to="profilePath" class="nav-link">
 									<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#user"/></svg>
 									Profile
 								</RouterLink>

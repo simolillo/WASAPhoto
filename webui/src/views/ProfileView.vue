@@ -17,127 +17,47 @@ export default {
         async getUserProfile() {
             try {
                 // profiles/username
-				// GET /users/?username="Maria"
+				// GET /user/{Simo}
                 let username = this.$route.params.username;
-				let response = await this.$axios.get('/users/', {params: {username: username}}, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
-				let user = response.data // userID, username
-				localStorage.setItem('token', user.userID);
-				localStorage.setItem('username', user.username);
-                alert(`Username correctly updated to: ${user.username}`)
+				let response = await this.$axios.get(`/user/{${username}}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
+				alert('qui arrivo')
+                let userID = response.data;
+                // GET /users/{1}/
+                response = await this.$axios.get(`/users/${userID}/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
+				let profile = response.data;
+                this.username = profile.username;
+                this.photosCount = profile.photosCount;
+                this.followersCount = profile.followersCount;
+                this.followingCount = profile.followingCount;
+                this.isItMe = profile.isItMe;
+                this.doIFollowUser = profile.doIFollowUser;
+                this.isInMyBannedList = profile.isInMyBannedList;
+                this.amIBanned = profile.amIBanned;
             } catch (error) {
+                alert('hola amigo')
 				const status = error.response.status;
         		const errorMessage = error.response.data;
-        		alert(`Status (${status}): ${errorMessage}`);
+        		//alert(`Status (${status}): ${errorMessage}`);
             }
         }
     },
     mounted() {
-        this.finishedMounted = true;
+        this.getUserProfile();
     }
 }
 </script>
 
 <template>
-
-    <div class="container-fluid" v-if="!currentIsBanned && userExists">
-        <div class="row">
-            <div class="col-12 d-flex justify-content-center">
-                <div class="card w-50 container-fluid">
-
-                    <div class="row">
-                        <div class="col">
-                            <div class="card-body d-flex justify-content-between align-items-center">
-                                <h5 class="card-title p-0 me-auto mt-auto">{{nickname}} @{{this.$route.params.id}}</h5>
-
-                                <button v-if="!sameUser && !banStatus" @click="followClick" class="btn btn-success ms-2">
-                                    {{followStatus ? "Unfollow" : "Follow"}}
-                                </button>
-
-                                <button v-if="!sameUser" @click="banClick" class="btn btn-danger ms-2">
-                                    {{banStatus ? "Unban" : "Ban"}}
-                                </button>
-
-                                <button v-else class="my-trnsp-btn ms-2" @click="goToSettings">
-                     
-                                    <i class="my-nav-icon-gear fa-solid fa-gear"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div v-if="!banStatus" class="row mt-1 mb-1">
-                        <div class="col-4 d-flex justify-content-start">
-                            <h6 class="ms-3 p-0 ">Posts: {{postCnt}}</h6>
-                        </div>
-                    
-                        <div class="col-4 d-flex justify-content-center">
-                            <h6 class=" p-0 ">Followers: {{followerCnt}}</h6>
-                        </div>
-                    
-                        <div class="col-4 d-flex justify-content-end">
-                            <h6 class=" p-0 me-3">Following: {{followingCnt}}</h6>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="row">
-
-            <div class="container-fluid mt-3">
-
-                <div class="row ">
-                    <div class="col-12 d-flex justify-content-center">
-                        <h2>Posts</h2>
-                        <input id="fileUploader" type="file" class="profile-file-upload" @change="uploadFile" accept=".jpg, .png">
-                        <label v-if="sameUser" class="btn my-btn-add-photo ms-2 d-flex align-items-center" for="fileUploader"> Add </label>
-                    </div>
-                </div>
-
-                <div class="row ">
-                    <div class="col-3"></div>
-                    <div class="col-6">
-                        <hr class="border border-dark">
-                    </div>
-                    <div class="col-3"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col">
-
-                <div v-if="!banStatus && postCnt>0">
-                    <Photo v-for="(photo,index) in photos" 
-                    :key="index" 
-                    :owner="this.$route.params.id" 
-                    :photo_id="photo.photo_id" 
-                    :comments="photo.comments" 
-                    :likes="photo.likes" 
-                    :upload_date="photo.date" 
-                    :isOwner="sameUser" 
-                    
-                    @removePhoto="removePhotoFromList"
-                    />
-
-                </div>
-                
-                <div v-else class="mt-5 ">
-                    <h2 class="d-flex justify-content-center" style="color: white;">No posts yet</h2>
-                </div>
-
-            </div>
-        </div>
-
-    
-    <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
-    </div>
-    <div v-else class="h-25 ">
-        <PageNotFound />
-    </div>
-    
-
+    <h1 v-if="isItMe">
+        username: {{ username }}
+        photosCount: {{ photosCount }}
+        followersCount: {{ followersCount }}
+        followingCount: {{ followingCount }}
+        isItMe: {{ isItMe }}
+        doIFollowUser: {{ doIFollowUser }}
+        isInMyBannedList: {{ isInMyBannedList }}
+        amIBanned: {{ amIBanned }}
+    </h1>
 </template>
 
 <style>
