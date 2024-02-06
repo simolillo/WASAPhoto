@@ -11,8 +11,23 @@ export default {
             doIFollowUser: false,
             isInMyBannedList: false,
             amIBanned: false,
+
+
 		}
 	},
+    watch: {
+        // property to watch
+        pathUsername(newUName, oldUName) {
+            if (newUName !== oldUName){
+                this.getUserProfile()
+            }
+        }
+    },
+    computed: {
+        pathUsername(){
+            return this.$route.params.username
+        },
+    },
     methods: {
         async getUserProfile() {
             try {

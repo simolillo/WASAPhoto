@@ -28,7 +28,7 @@ export default {
 	computed: {
 		// profilePath
 		profilePath() {
-			const username = localStorage.getItem('username');
+			let username = localStorage.getItem('username');
 			return `/profiles/${username}`;
 		}
 	}
