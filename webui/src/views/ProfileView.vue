@@ -34,10 +34,9 @@ export default {
                 this.isInMyBannedList = profile.isInMyBannedList;
                 this.amIBanned = profile.amIBanned;
             } catch (error) {
-                alert('hola amigo')
 				const status = error.response.status;
         		const errorMessage = error.response.data;
-        		//alert(`Status (${status}): ${errorMessage}`);
+        		alert(`Status (${status}): ${errorMessage}`);
             }
         }
     },
