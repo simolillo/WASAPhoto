@@ -42,11 +42,11 @@ export default {
             }
             try {
                 // /profiles/username
-                // GET /user/{Simo}
+                // GET /user/{username}
                 let username = this.$route.params.username;
                 let response = await this.$axios.get(`/user/${username}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
                 this.userID = response.data;
-                // GET /users/{1}/
+                // GET /users/{uid}/
                 response = await this.$axios.get(`/users/${this.userID}/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
                 let profile = response.data;
                 this.username = profile.username;
@@ -69,11 +69,11 @@ export default {
 		async followBtn() {
             try {
                 if (this.doIFollowUser) { 
-                     // DELETE /following/{1}
+                     // DELETE /following/{uid}
                     await this.$axios.delete(`/following/${this.userID}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
                     this.followersCount -=1
                 } else {
-                    // PUT /following/{1}
+                    // PUT /following/{uid}
                     await this.$axios.put(`/following/${this.userID}`, null, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
                     this.followersCount +=1
                 }
@@ -87,11 +87,11 @@ export default {
         async banBtn() {
             try {
                 if (this.isInMyBannedList) {
-                    // DELETE /banned/{1}
+                    // DELETE /banned/{uid}
                     await this.$axios.delete(`/banned/${this.userID}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
                     this.getUserProfile();
                 } else {
-                    // PUT /banned/{1}
+                    // PUT /banned/{uid}
                     await this.$axios.put(`/banned/${this.userID}`, null, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
                     this.getUserProfile();
                 }
@@ -103,7 +103,7 @@ export default {
 		},
         async getPhotosList() {
             try {
-                // GET /users/{1}/photos/
+                // GET /users/{uid}/photos/
                 let response = await this.$axios.get(`/users/${this.userID}/photos/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
                 this.photosList = response.data;
                 console.log(this.photosList)
