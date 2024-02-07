@@ -3,6 +3,9 @@
 export default {
 	data: function() {
 		return {
+            errormsg: null,
+
+            // getUserProfile
 			username: "",
             photosCount: 0,
             followersCount: 0,
@@ -11,6 +14,9 @@ export default {
             doIFollowUser: false,
             isInMyBannedList: false,
             amIBanned: false,
+
+            // getPhotosList
+            photosList: [],
 
             userExists: false,
             userID: 0,
@@ -43,7 +49,6 @@ export default {
                 // GET /users/{1}/
                 response = await this.$axios.get(`/users/${this.userID}/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
                 let profile = response.data;
-                console.log(profile)
                 this.username = profile.username;
                 this.photosCount = profile.photosCount;
                 this.followersCount = profile.followersCount;
@@ -53,10 +58,9 @@ export default {
                 this.isInMyBannedList = profile.isInMyBannedList;
                 this.amIBanned = profile.amIBanned;
                 this.userExists = true;
+                this.getPhotosList();
             } catch (error) {
-				const status = error.response.status;
-        		const errorMessage = error.response.data;
-        		alert(`Status (${status}): ${errorMessage}`);
+				this.errormsg = e.toString();
             }
         },
 		async followBtn() {
@@ -73,15 +77,13 @@ export default {
                 }
                 this.doIFollowUser = !this.doIFollowUser
             } catch (error) {
-                const status = error.response.status;
-        		const errorMessage = error.response.data;
-        		alert(`Status (${status}): ${errorMessage}`);
+                this.errormsg = e.toString();
             }
 		},
         async banBtn() {
             try {
                 if (this.isInMyBannedList) {
-                     // DELETE /banned/{1}
+                    // DELETE /banned/{1}
                     await this.$axios.delete(`/banned/${this.userID}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
                     this.getUserProfile();
                 } else {
@@ -90,11 +92,19 @@ export default {
                     this.getUserProfile();
                 }
             } catch (error) {
-                const status = error.response.status;
-        		const errorMessage = error.response.data;
-        		alert(`Status (${status}): ${errorMessage}`);
+                this.errormsg = e.toString();
             }
 		},
+        async getPhotosList() {
+            try {
+                // GET /users/{1}/photos/
+                response = await this.$axios.get(`/users/${this.userID}/photos/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
+                this.photosList = response.data;
+                console.log(this.photosList)
+            } catch (error) {
+				this.errormsg = e.toString();
+            }
+        },
     },
     mounted() {
         this.getUserProfile();

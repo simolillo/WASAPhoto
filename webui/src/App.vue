@@ -5,6 +5,8 @@ import { RouterLink, RouterView } from 'vue-router'
 export default {
 	data: function() {
 		return {
+			errormsg: null,
+
 			profilePath: "",
 		}
 	},
@@ -25,9 +27,7 @@ export default {
 				this.profilePath = `/profiles/${user.username}`; // update personal profile path
 				this.$router.replace('/home');
 			} catch (error) {
-				const status = error.response.status;
-        		const errorMessage = error.response.data;
-        		alert(`Status (${status}): ${errorMessage}`);
+				this.errormsg = e.toString();
 			}
 		}
 	},
