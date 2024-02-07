@@ -181,8 +181,7 @@ export default {
 
         <div class="row">
             <div class="col">
-
-                <div v-if="!banStatus && postCnt>0">
+                <div v-if="!isInMyBannedList && photosCount>0">
                     <Photo v-for="(photo,index) in photos" 
                     :key="index" 
                     :owner="this.$route.params.id" 
