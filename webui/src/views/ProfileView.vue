@@ -37,14 +37,14 @@ export default {
     },
     methods: {
         async getUserProfile() {
-            if (this.$route.params.username === undefined){
+            if (this.$route.params.username === undefined) {
                 return
             }
             try {
-                // profiles/username
-				// GET /user/{Simo}
+                // /profiles/username
+                // GET /user/{Simo}
                 let username = this.$route.params.username;
-				let response = await this.$axios.get(`/user/${username}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
+                let response = await this.$axios.get(`/user/${username}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
                 this.userID = response.data;
                 // GET /users/{1}/
                 response = await this.$axios.get(`/users/${this.userID}/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
@@ -59,13 +59,15 @@ export default {
                 this.amIBanned = profile.amIBanned;
                 this.userExists = true;
                 this.getPhotosList();
+                console.log('photos');
             } catch (error) {
-				this.errormsg = e.toString();
+                const status = error.response.status;
+        		const reason = error.response.data;
+                this.errormsg = `Status ${status}: ${reason}`;
             }
         },
 		async followBtn() {
             try {
-                console.log(localStorage.getItem('token'))
                 if (this.doIFollowUser) { 
                      // DELETE /following/{1}
                     await this.$axios.delete(`/following/${this.userID}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
@@ -77,7 +79,9 @@ export default {
                 }
                 this.doIFollowUser = !this.doIFollowUser
             } catch (error) {
-                this.errormsg = e.toString();
+                const status = error.response.status;
+        		const reason = error.response.data;
+                this.errormsg = `Status ${status}: ${reason}`;
             }
 		},
         async banBtn() {
@@ -92,17 +96,21 @@ export default {
                     this.getUserProfile();
                 }
             } catch (error) {
-                this.errormsg = e.toString();
+                const status = error.response.status;
+        		const reason = error.response.data;
+                this.errormsg = `Status ${status}: ${reason}`;
             }
 		},
         async getPhotosList() {
             try {
                 // GET /users/{1}/photos/
-                response = await this.$axios.get(`/users/${this.userID}/photos/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
+                let response = await this.$axios.get(`/users/${this.userID}/photos/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
                 this.photosList = response.data;
                 console.log(this.photosList)
             } catch (error) {
-				this.errormsg = e.toString();
+				const status = error.response.status;
+        		const reason = error.response.data;
+                this.errormsg = `Status ${status}: ${reason}`;
             }
         },
     },
@@ -195,15 +203,12 @@ export default {
 
             </div>
         </div>
-
-    
-    <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
     </div>
+
     <div v-else class="h-25 ">
-        <PageNotFound />
+        <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
     </div>
     
-
 </template>
 
 <style>

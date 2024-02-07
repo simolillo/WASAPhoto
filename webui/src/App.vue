@@ -6,8 +6,6 @@ export default {
 	data: function() {
 		return {
 			errormsg: null,
-
-			profilePath: "",
 		}
 	},
 	methods: {
@@ -24,10 +22,11 @@ export default {
 				let user = response.data // userID, username
 				localStorage.setItem('token', user.userID);
 				localStorage.setItem('username', user.username);
-				this.profilePath = `/profiles/${user.username}`; // update personal profile path
 				this.$router.replace('/home');
 			} catch (error) {
-				this.errormsg = e.toString();
+				const status = error.response.status;
+        		const reason = error.response.data;
+                this.errormsg = `Status ${status}: ${reason}`;
 			}
 		}
 	},
@@ -71,7 +70,7 @@ export default {
 								</RouterLink>
 							</li>
 							<li class="nav-item">
-								<RouterLink :to="profilePath" class="nav-link">
+								<RouterLink to="/personalProfile" class="nav-link">
 									<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#user"/></svg>
 									Profile
 								</RouterLink>

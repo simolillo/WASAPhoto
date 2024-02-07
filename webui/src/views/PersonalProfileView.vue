@@ -1,0 +1,19 @@
+<script>
+export default {
+	methods: {
+        // redirects to /profiles/:username
+		async redirect() {
+		    this.$router.replace(`/profiles/${localStorage.getItem('username')}`);
+		},
+	},
+	mounted() {
+		this.redirect()
+	}
+}
+</script>
+
+<template>
+</template>
+
+<style>
+</style>
