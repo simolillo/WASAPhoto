@@ -485,7 +485,7 @@ paths:
       responses:
         "200":
           # OK
-          description: Photo details retrieved successfully.
+          description: Photo file retrieved successfully.
           content:
             image/*:
               schema: { $ref: '#/components/schemas/BinaryImage' }
@@ -494,12 +494,6 @@ paths:
           description: |-
             Invalid path parameter pid or;
             pid not matching any existing photo.
-        "401":
-          # Unauthorized
-          $ref: '#/components/responses/Unauthorized'
-        "403":
-          # Forbidden
-          $ref: '#/components/responses/Forbidden'
 
 
   /likes/{pid}:

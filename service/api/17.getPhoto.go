@@ -18,7 +18,7 @@ import (
 func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var pathPid uint64
-	pathPid, err = strconv.ParseUint(ps.ByName("pid"), 10, 64)
+	pathPid, err := strconv.ParseUint(ps.ByName("pid"), 10, 64)
 
 	// BadRequest check
 	if err != nil {
@@ -34,18 +34,6 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	if !present {
 		stringErr := "getPhoto: path parameter pid not matching any existing photo"
 		http.Error(w, stringErr, http.StatusBadRequest)
-		return
-	}
-
-	// Forbidden check
-	someoneIsBanned, err := rt.db.CheckBanBothDirections(requestingUser.ID, photo.AuthorID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if someoneIsBanned {
-		stringErr := "getPhoto: someone has banned the other"
-		http.Error(w, stringErr, http.StatusForbidden)
 		return
 	}
 
