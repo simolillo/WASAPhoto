@@ -186,7 +186,7 @@ export default {
                     :key="index" 
                     :owner="this.$route.params.id" 
                     :photo_id="photo.photo_id" 
-                    :comments="photo.comments" 
+                    :comments="photo.comments"
                     :likes="photo.likes" 
                     :upload_date="photo.date" 
                     :isOwner="sameUser" 
