@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-var Root = filepath.Join("/private", "tmp", "photos")
+var Root = filepath.Join("/tmp", "photos")
 
 func CreatePhotoFile(photo Photo, binaryImage []byte) (err error) {
 	err = os.MkdirAll(Root, 0755)
