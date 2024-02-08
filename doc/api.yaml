@@ -599,7 +599,10 @@ paths:
           content:
             application/json:
               schema:
+                description: Comments list.
                 type: array
+                minItems: 0
+                maxItems: 99
                 items: { $ref: '#/components/schemas/Comment' }
         "400":
           # Bad Request
@@ -697,7 +700,10 @@ paths:
           content:
             application/json:
               schema:
+                description: Photos list.
                 type: array
+                minItems: 0
+                maxItems: 99
                 items: { $ref: '#/components/schemas/Photo' }
         "400":
           # Bad Request
@@ -732,7 +738,10 @@ paths:
           content:
             application/json:
               schema:
+                description: Users list.
                 type: array
+                minItems: 0
+                maxItems: 99
                 items: { $ref: '#/components/schemas/User' }
         "400":
           # Bad Request
@@ -767,7 +776,10 @@ paths:
           content:
             application/json:
               schema:
+                description: Users list.
                 type: array
+                minItems: 0
+                maxItems: 99
                 items: { $ref: '#/components/schemas/User' }
         "400":
           # Bad Request
@@ -802,7 +814,10 @@ paths:
           content:
             application/json:
               schema:
+                description: Users list.
                 type: array
+                minItems: 0
+                maxItems: 99
                 items: { $ref: '#/components/schemas/User' }
         "400":
           # Bad Request
@@ -834,7 +849,10 @@ paths:
           content:
             application/json:
               schema:
+                description: Photos list.
                 type: array
+                minItems: 0
+                maxItems: 99
                 items: { $ref: '#/components/schemas/Photo' }
         "401":
           # Unauthorized
@@ -896,7 +914,10 @@ paths:
           content:
             application/json:
               schema:
+                description: Users list.
                 type: array
+                minItems: 0
+                maxItems: 99
                 items: { $ref: '#/components/schemas/User' }
         "401":
           # Unauthorized
