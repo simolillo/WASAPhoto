@@ -29,7 +29,7 @@ func (db *appdbimpl) SearchUserByUsername(username string) (dbUser User, present
 	query := "SELECT * FROM users WHERE username = ?;"
 
 	err = db.c.QueryRow(query, username).Scan(&dbUser.ID, &dbUser.Name)
-	if err != nil && err != sql.ErrNoRows{
+	if err != nil && err != sql.ErrNoRows {
 		return
 	} else if err == sql.ErrNoRows {
 		err = nil
@@ -46,7 +46,7 @@ func (db *appdbimpl) SearchUserByID(ID uint64) (dbUser User, present bool, err e
 	query := "SELECT * FROM users WHERE userID = ?;"
 
 	err = db.c.QueryRow(query, ID).Scan(&dbUser.ID, &dbUser.Name)
-	if err != nil && err != sql.ErrNoRows{
+	if err != nil && err != sql.ErrNoRows {
 		return
 	} else if err == sql.ErrNoRows {
 		err = nil

@@ -9,15 +9,15 @@ curl -v \
 */
 
 import (
-	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
-	"github.com/julienschmidt/httprouter"
 	"encoding/json"
+	"github.com/julienschmidt/httprouter"
+	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 	"net/http"
 	"strconv"
 )
 
 func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	
+
 	var token uint64
 	token, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 

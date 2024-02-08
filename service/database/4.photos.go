@@ -30,7 +30,7 @@ func (db *appdbimpl) SearchPhotoByID(ID uint64) (dbPhoto Photo, present bool, er
 
 	row := db.c.QueryRow(query, ID)
 	err = row.Scan(&dbPhoto.ID, &dbPhoto.AuthorID, &dbPhoto.Format, &dbPhoto.Date)
-	if err != nil && err != sql.ErrNoRows{
+	if err != nil && err != sql.ErrNoRows {
 		return
 	} else if err == sql.ErrNoRows {
 		err = nil

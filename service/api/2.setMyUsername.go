@@ -11,9 +11,9 @@ curl -v \
 */
 
 import (
-	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
-	"github.com/julienschmidt/httprouter"
 	"encoding/json"
+	"github.com/julienschmidt/httprouter"
+	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 	"net/http"
 	"strconv"
 )
@@ -68,7 +68,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 
 	// database section
 	err = rt.db.UpdateUsername(updatedUser.ToDatabase())
-	
+
 	// InternalServerError check
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

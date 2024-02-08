@@ -8,9 +8,9 @@ curl -v \
 */
 
 import (
+	"github.com/julienschmidt/httprouter"
 	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 	"github.com/simolillo/WASAPhoto/service/fileSystem"
-	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"strconv"
 )
@@ -39,7 +39,7 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 
 	fsPhoto := fs.Photo(photo)
 	photoPath := fsPhoto.Path()
-	
+
 	// serving photo
 	w.Header().Set("Content-Type", "image/*")
 	w.WriteHeader(http.StatusOK)

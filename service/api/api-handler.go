@@ -11,7 +11,7 @@ func (rt *_router) Handler() http.Handler {
 
 	// Session
 	rt.router.POST("/session", rt.wrap(rt.doLogin))
-	
+
 	// Settings
 	rt.router.PUT("/settings", rt.wrap(rt.setMyUserName))
 

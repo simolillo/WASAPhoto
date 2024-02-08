@@ -2,8 +2,8 @@ package api
 
 import (
 	"github.com/simolillo/WASAPhoto/service/database"
-	"strings"
 	"regexp"
+	"strings"
 )
 
 type User struct {

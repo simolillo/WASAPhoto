@@ -11,18 +11,18 @@ curl -v \
 */
 
 import (
+	"encoding/json"
+	"github.com/julienschmidt/httprouter"
 	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 	"github.com/simolillo/WASAPhoto/service/fileSystem"
-	"github.com/julienschmidt/httprouter"
-	"encoding/json"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
-	"io"
 )
 
 func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	
+
 	var token uint64
 	token, err := strconv.ParseUint(r.Header.Get("Authorization"), 10, 64)
 
@@ -44,7 +44,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	binaryData, err := io.ReadAll(r.Body)
-	
+
 	// BadRequest check
 	if err != nil {
 		stringErr := "uploadPhoto: invalid binary data"
@@ -66,8 +66,8 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	binaryImage := binaryData
 	photo := Photo{
 		AuthorID: author.ID,
-		Format: format,
-		Date: time.Now().Format("2006-01-02 15:04:05"),
+		Format:   format,
+		Date:     time.Now().Format("2006-01-02 15:04:05"),
 	}
 
 	// database section
@@ -82,7 +82,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// fileSystem section
 	err = fs.CreatePhotoFile(photo.ToFileSystem(), binaryImage)
-	
+
 	// InternalServerError check
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

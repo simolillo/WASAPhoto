@@ -25,10 +25,10 @@ func (db *appdbimpl) CheckFollow(followerID uint64, followedID uint64) (isFollow
 }
 
 func (db *appdbimpl) RemoveFollowBothDirections(user1ID uint64, user2ID uint64) (err error) {
-    err = db.UnfollowUser(user1ID, user2ID)
-    if err != nil {
-        return err
-    }
-    err = db.UnfollowUser(user2ID, user1ID)
-    return err
+	err = db.UnfollowUser(user1ID, user2ID)
+	if err != nil {
+		return err
+	}
+	err = db.UnfollowUser(user2ID, user1ID)
+	return err
 }

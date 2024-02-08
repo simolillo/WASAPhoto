@@ -9,9 +9,9 @@ curl -v \
 */
 
 import (
-	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
-	"github.com/julienschmidt/httprouter"
 	"encoding/json"
+	"github.com/julienschmidt/httprouter"
+	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 	"net/http"
 	"strconv"
 )
@@ -82,11 +82,11 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 	requestedProfile.AmIBanned = isBanned
-	
+
 	// database section
 	dbProfile, err := rt.db.GetUserProfile(requestedUser.ID)
 	requestedProfile.FromDatabase(dbProfile)
-		
+
 	// InternalServerError check
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

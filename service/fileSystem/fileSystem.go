@@ -3,8 +3,8 @@ package fs
 // "github.com/simolillo/WASAPhoto/service/fileSystem"
 
 import (
-	"path/filepath"
 	"os"
+	"path/filepath"
 )
 
 var Root = filepath.Join("/tmp", "photos")
@@ -24,6 +24,6 @@ func CreatePhotoFile(photo Photo, binaryImage []byte) (err error) {
 }
 
 func DeletePhotoFile(photo Photo) (err error) {
-    err = os.Remove(photo.Path())
-    return
+	err = os.Remove(photo.Path())
+	return
 }

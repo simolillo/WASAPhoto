@@ -16,7 +16,7 @@ func (db *appdbimpl) CommentPhoto(comment Comment) (dbComment Comment, err error
 }
 
 func (db *appdbimpl) UncommentPhoto(ID uint64) (err error) {
-	
+
 	query := "DELETE FROM comments WHERE commentID = ?;"
 
 	_, err = db.c.Exec(query, ID)
@@ -29,7 +29,7 @@ func (db *appdbimpl) SearchCommentByID(ID uint64) (dbComment Comment, present bo
 
 	row := db.c.QueryRow(query, ID)
 	err = row.Scan(&dbComment.ID, &dbComment.PhotoID, &dbComment.AuthorID, &dbComment.Text, &dbComment.Date)
-	if err != nil && err != sql.ErrNoRows{
+	if err != nil && err != sql.ErrNoRows {
 		return
 	} else if err == sql.ErrNoRows {
 		err = nil
@@ -49,9 +49,9 @@ func (db *appdbimpl) RemoveCommentsBothDirections(user1ID uint64, user2ID uint64
 		AND  authorID = ?;`
 
 	_, err = db.c.Exec(query, user1ID, user2ID)
-    if err != nil {
-        return err
-    }
+	if err != nil {
+		return err
+	}
 	_, err = db.c.Exec(query, user2ID, user1ID)
 	return
 }

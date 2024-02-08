@@ -5,11 +5,11 @@ import (
 )
 
 type Comment struct {
-	ID uint64       `json:"commentID"`
-	PhotoID uint64  `json:"photoID"`
+	ID       uint64 `json:"commentID"`
+	PhotoID  uint64 `json:"photoID"`
 	AuthorID uint64 `json:"authorID"`
-	Text string     `json:"commentText"`
-	Date string     `json:"date"`
+	Text     string `json:"commentText"`
+	Date     string `json:"date"`
 }
 
 func (c *Comment) ToDatabase() database.Comment {

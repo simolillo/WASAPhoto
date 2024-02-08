@@ -38,8 +38,8 @@ package api
 
 import (
 	"errors"
-	"github.com/simolillo/WASAPhoto/service/database"
 	"github.com/julienschmidt/httprouter"
+	"github.com/simolillo/WASAPhoto/service/database"
 	"github.com/sirupsen/logrus"
 	"net/http"
 )

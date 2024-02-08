@@ -18,7 +18,7 @@ func (db *appdbimpl) SearchUser(usernameToSearch string) (usersList []User, err 
 		}
 		usersList = append(usersList, user)
 	}
-	
+
 	err = rows.Err()
 	return
 }

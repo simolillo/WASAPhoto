@@ -9,9 +9,9 @@ curl -v \
 */
 
 import (
+	"github.com/julienschmidt/httprouter"
 	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 	"github.com/simolillo/WASAPhoto/service/fileSystem"
-	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"strconv"
 )

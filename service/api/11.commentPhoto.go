@@ -11,13 +11,13 @@ curl -v \
 */
 
 import (
-	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
-	"github.com/julienschmidt/httprouter"
 	"encoding/json"
+	"github.com/julienschmidt/httprouter"
+	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
-	"io"
 )
 
 func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -82,10 +82,10 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 	commentText := string(body)
 	comment := Comment{
-		PhotoID: photo.ID,
+		PhotoID:  photo.ID,
 		AuthorID: author.ID,
-		Text: commentText,
-		Date: time.Now().Format("2006-01-02 15:04:05"),
+		Text:     commentText,
+		Date:     time.Now().Format("2006-01-02 15:04:05"),
 	}
 
 	// database section
