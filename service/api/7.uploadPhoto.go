@@ -6,7 +6,7 @@ curl -v \
 	-X POST \
 	-H 'Authorization: 1' \
 	-H 'Content-Type: image/*' \
-	--data-binary "@/Users/simonerussolillo/Pictures/Random/rainforest.png" \
+	--data-binary "@home/wasa/Pictures/img/bird/bird1.jpeg" \
 	localhost:3000/photos/
 */
 

@@ -101,6 +101,24 @@ export default {
                 this.errormsg = `Status ${status}: ${reason}`;
             }
 		},
+        async uploadPhoto() {
+            try {
+                let file = document.getElementById('fileUploader').files[0];
+                const reader = new FileReader();
+                reader.readAsArrayBuffer(file); // stored in result attribute
+                reader.onload = async () => {
+                    // POST /photos/
+                    let response = await this.$axios.post('/photos/', reader.result, {headers: {'Authorization': `${localStorage.getItem('token')}`, 'Content-Type': 'image/*'}});
+                    this.photosList.unshift(response.data); // at the beginning of the list
+                    this.photosCount += 1;
+                    location.reload(); // same as the reload button in your browser
+                }
+            } catch (error) {
+                const status = error.response.status;
+        		const reason = error.response.data;
+                this.errormsg = `Status ${status}: ${reason}`;
+            }
+        },
         async getPhotosList() {
             try {
                 // GET /users/{uid}/photos/
@@ -113,6 +131,9 @@ export default {
                 this.errormsg = `Status ${status}: ${reason}`;
             }
         },
+        removePhotoFromList(photoID){
+			this.photosList = this.photosList.filter(photo => photo.photoID != photoID);
+		},
     },
     mounted() {
         this.getUserProfile();
@@ -165,7 +186,7 @@ export default {
                 <div class="row ">
                     <div class="col-12 d-flex justify-content-center">
                         <h2>Posts</h2>
-                        <input id="fileUploader" type="file" class="profile-file-upload" @change="uploadFile" accept=".jpg, .png, .jpeg">
+                        <input id="fileUploader" type="file" class="profile-file-upload" @change="uploadPhoto" accept=".jpg, .png, .jpeg">
                         <label v-if="isItMe" class="btn my-btn-add-photo ms-2 d-flex align-items-center" for="fileUploader"> Add </label>
                     </div>
                 </div>
@@ -182,7 +203,7 @@ export default {
         <div class="row">
             <div class="col">
                 <div v-if="!isInMyBannedList && photosCount>0">
-                    <Photo v-for="(photo,index) in photos" 
+                    <Photo v-for="(photo,index) in photosList" 
                     :key="index" 
                     :owner="this.$route.params.id" 
                     :photo_id="photo.photo_id" 
@@ -204,9 +225,7 @@ export default {
         </div>
     </div>
 
-    <div v-else class="h-25 ">
-        <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
-    </div>
+    <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
     
 </template>
 
