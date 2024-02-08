@@ -59,7 +59,6 @@ export default {
                 this.amIBanned = profile.amIBanned;
                 this.userExists = true;
                 this.getPhotosList();
-                console.log('photos');
             } catch (error) {
                 const status = error.response.status;
         		const reason = error.response.data;
@@ -124,7 +123,30 @@ export default {
                 // GET /users/{uid}/photos/
                 let response = await this.$axios.get(`/users/${this.userID}/photos/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
                 this.photosList = response.data;
-                console.log(this.photosList)
+            } catch (error) {
+				const status = error.response.status;
+        		const reason = error.response.data;
+                this.errormsg = `Status ${status}: ${reason}`;
+            }
+        },
+        async getLikesList(photoID) {
+            try {
+                // GET /photos/{pid}/likes/
+                let response = await this.$axios.get(`/photos/${photoID}/likes/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
+                let likesList = response.data;
+                return likesList;
+            } catch (error) {
+				const status = error.response.status;
+        		const reason = error.response.data;
+                this.errormsg = `Status ${status}: ${reason}`;
+            }
+        },
+        async getCommentsList(photoID) {
+            try {
+                // GET /photos/{pid}/comments/
+                let response = await this.$axios.get(`/photos/${photoID}/comments/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
+                let commentsList = response.data;
+                return commentsList;
             } catch (error) {
 				const status = error.response.status;
         		const reason = error.response.data;
@@ -208,19 +230,16 @@ export default {
                     :authorID="photo.authorID"
                     :authorUsername="this.username"
                     :date="photo.date"
-                    :comments="photo.comments"
-                    :likes="photo.likes" 
-                    :isOwner="sameUser" 
-                    
+                    :likesList="getLikesList(photo.photoID)"
+                    :commentsList="getCommentsList(photo.photoID)"
+                    :isItMe="isItMe" 
                     @removePhoto="removePhotoFromList"
                     />
-
                 </div>
                 
                 <div v-else class="mt-5 ">
                     <h2 class="d-flex justify-content-center" style="color: white;">No posts yet</h2>
                 </div>
-
             </div>
         </div>
     </div>
