@@ -18,6 +18,9 @@ export default {
             // getPhotosList
             photosList: [],
 
+            // getLikesLists
+            likesLists: [],
+
             userExists: false,
             userID: 0,
 		}
@@ -58,7 +61,7 @@ export default {
                 this.isInMyBannedList = profile.isInMyBannedList;
                 this.amIBanned = profile.amIBanned;
                 this.userExists = true;
-                this.getPhotosList();
+                await this.getPhotosList();
             } catch (error) {
                 const status = error.response.status;
         		const reason = error.response.data;
@@ -122,19 +125,21 @@ export default {
             try {
                 // GET /users/{uid}/photos/
                 let response = await this.$axios.get(`/users/${this.userID}/photos/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
-                this.photosList = response.data;
+                this.photosList = response.data === null ? [] : response.data;
             } catch (error) {
 				const status = error.response.status;
         		const reason = error.response.data;
                 this.errormsg = `Status ${status}: ${reason}`;
             }
         },
-        async getLikesList(photoID) {
+        async getLikesLists() {
             try {
-                // GET /photos/{pid}/likes/
-                let response = await this.$axios.get(`/photos/${photoID}/likes/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
-                let likesList = response.data;
-                return likesList;
+                for (const photo of this.photosList) {
+                    // GET /photos/{pid}/likes/
+                    let response = await this.$axios.get(`/photos/${photo.photoID}/likes/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
+                    let likesList = response.data === null ? [] : response.data;
+                    this.likesLists.push(likesList);
+                }
             } catch (error) {
 				const status = error.response.status;
         		const reason = error.response.data;
@@ -145,7 +150,7 @@ export default {
             try {
                 // GET /photos/{pid}/comments/
                 let response = await this.$axios.get(`/photos/${photoID}/comments/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
-                let commentsList = response.data;
+                let commentsList = response.data === null ? [] : response.data;
                 return commentsList;
             } catch (error) {
 				const status = error.response.status;
@@ -225,19 +230,19 @@ export default {
         <div class="row">
             <div class="col">
                 <div v-if="!isInMyBannedList && photosCount>0">
-                    <Photo v-for="photo in photosList"
+                    <Photo v-for="(photo, index) in photosList"
                     :photoID="photo.photoID"
                     :authorID="photo.authorID"
                     :authorUsername="this.username"
                     :date="photo.date"
-                    :likesList="getLikesList(photo.photoID)"
+                    :likesList="likesLists[index]"
                     :commentsList="getCommentsList(photo.photoID)"
                     :isItMe="isItMe" 
                     @removePhoto="removePhotoFromList"
                     />
                 </div>
                 
-                <div v-else class="mt-5 ">
+                <div v-if="!isInMyBannedList && photosCount==0" class="mt-5 ">
                     <h2 class="d-flex justify-content-center" style="color: white;">No posts yet</h2>
                 </div>
             </div>
