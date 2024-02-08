@@ -47,7 +47,7 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		http.Error(w, stringErr, http.StatusBadRequest)
 		return
 	}
-	photo, present, err := rt.db.SearchPhotoByID(pathPid)
+	dbPhoto, present, err := rt.db.SearchPhotoByID(pathPid)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -59,14 +59,14 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// Forbidden check
-	if requestingUser.ID != photo.AuthorID {
+	if requestingUser.ID != dbPhoto.AuthorID {
 		stringErr := "deletePhoto: requesting user not author of the photo"
 		http.Error(w, stringErr, http.StatusForbidden)
 		return
 	}
 
 	// database section
-	err = rt.db.DeletePhoto(photo.ID)
+	err = rt.db.DeletePhoto(dbPhoto.ID)
 
 	// InternalServerError check
 	if err != nil {
@@ -75,7 +75,9 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// fileSystem section
-	err = fs.DeletePhotoFile(fs.Photo(photo))
+	var photo Photo
+	photo.FromDatabase(dbPhoto)
+	err = fs.DeletePhotoFile(photo.ToFileSystem())
 
 	// InternalServerError check
 	if err != nil {

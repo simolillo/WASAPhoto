@@ -10,7 +10,6 @@ curl -v \
 import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
-	"github.com/simolillo/WASAPhoto/service/fileSystem"
 	"net/http"
 	"strconv"
 )
@@ -26,7 +25,7 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 		http.Error(w, stringErr, http.StatusBadRequest)
 		return
 	}
-	photo, present, err := rt.db.SearchPhotoByID(pathPid)
+	dbPhoto, present, err := rt.db.SearchPhotoByID(pathPid)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -37,7 +36,9 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	fsPhoto := fs.Photo(photo)
+	var photo Photo
+	photo.FromDatabase(dbPhoto)
+	fsPhoto := photo.ToFileSystem()
 	photoPath := fsPhoto.Path()
 
 	// serving photo
