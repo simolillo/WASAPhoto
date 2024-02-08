@@ -203,13 +203,13 @@ export default {
         <div class="row">
             <div class="col">
                 <div v-if="!isInMyBannedList && photosCount>0">
-                    <Photo v-for="(photo,index) in photosList" 
-                    :key="index" 
-                    :owner="this.$route.params.id" 
-                    :photo_id="photo.photo_id" 
+                    <Photo v-for="photo in photosList"
+                    :photoID="photo.photoID"
+                    :authorID="photo.authorID"
+                    :authorUsername="this.username"
+                    :date="photo.date"
                     :comments="photo.comments"
                     :likes="photo.likes" 
-                    :upload_date="photo.date" 
                     :isOwner="sameUser" 
                     
                     @removePhoto="removePhotoFromList"
