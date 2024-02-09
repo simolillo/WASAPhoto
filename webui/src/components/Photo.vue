@@ -6,10 +6,12 @@ export default {
 
 			photoURL: "",
 			liked: false,
+            likesList: [],
+            commentsList: [],
 		}
 	},
 
-	props: ['photoID','authorID','authorUsername','date','likesList','commentsList','isItMe'], 
+	props: ['photoID','authorID','authorUsername','date','likesListParent','commentsListParent','isItMe'], 
 
 	methods: {
 		getPhoto() {
@@ -40,7 +42,7 @@ export default {
 					this.likesList.push({userID: localStorage.getItem('token'), username: localStorage.getItem('username')});
 				} else {
 					// DELETE /likes/{pid}
-                    await this.$axios.put(`/likes/${this.photoID}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
+                    await this.$axios.delete(`/likes/${this.photoID}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
                     this.likesList = this.likesList.filter(user => user.userID != localStorage.getItem('token'));
 				}
 				this.liked = !this.liked;
@@ -61,6 +63,13 @@ export default {
 	},
 	async mounted() {
         this.getPhoto()
+        // it is a promise
+        if (this.likesListParent != null) {
+            this.likesList = this.likesListParent
+        }
+        if (this.commentsListParent != null) {
+            this.commentsList = this.commentsListParent
+        }
 		this.liked = this.likesList.some(user => user.userID == localStorage.getItem('token'));
 	},
 }

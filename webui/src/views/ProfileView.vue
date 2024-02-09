@@ -18,9 +18,6 @@ export default {
             // getPhotosList
             photosList: [],
 
-            // getLikesLists
-            likesLists: [],
-
             userExists: false,
             userID: 0,
 		}
@@ -132,34 +129,9 @@ export default {
                 this.errormsg = `Status ${status}: ${reason}`;
             }
         },
-        async getLikesLists() {
-            try {
-                for (const photo of this.photosList) {
-                    // GET /photos/{pid}/likes/
-                    let response = await this.$axios.get(`/photos/${photo.photoID}/likes/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
-                    let likesList = response.data === null ? [] : response.data;
-                    this.likesLists.push(likesList);
-                }
-            } catch (error) {
-				const status = error.response.status;
-        		const reason = error.response.data;
-                this.errormsg = `Status ${status}: ${reason}`;
-            }
-        },
-        async getCommentsList(photoID) {
-            try {
-                // GET /photos/{pid}/comments/
-                let response = await this.$axios.get(`/photos/${photoID}/comments/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
-                let commentsList = response.data === null ? [] : response.data;
-                return commentsList;
-            } catch (error) {
-				const status = error.response.status;
-        		const reason = error.response.data;
-                this.errormsg = `Status ${status}: ${reason}`;
-            }
-        },
         removePhotoFromList(photoID){
 			this.photosList = this.photosList.filter(photo => photo.photoID != photoID);
+            this.photosCount -= 1
 		},
     },
     mounted() {
@@ -230,13 +202,13 @@ export default {
         <div class="row">
             <div class="col">
                 <div v-if="!isInMyBannedList && photosCount>0">
-                    <Photo v-for="(photo, index) in photosList"
+                    <Photo v-for="photo in photosList"
                     :photoID="photo.photoID"
                     :authorID="photo.authorID"
                     :authorUsername="this.username"
                     :date="photo.date"
-                    :likesList="likesLists[index]"
-                    :commentsList="getCommentsList(photo.photoID)"
+                    :likesListParent="photo.likesList"
+                    :commentsListParent="photo.commentsList"
                     :isItMe="isItMe" 
                     @removePhoto="removePhotoFromList"
                     />
