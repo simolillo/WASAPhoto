@@ -35,7 +35,7 @@ export default {
                 alert(this.errormsg);
             }
         },
-        
+
 	},
 }
 </script>
@@ -54,9 +54,8 @@ export default {
                             <hr>
                             <div class="row">
                                 <div class="col-10">
-                                    <h5>@{{author}}</h5>
+                                    <h5>@{{comment.authorUsername}}</h5>
                                 </div>
-
                                 <div class="col-2">
                                     <button v-if="user === author || user === photo_owner" class="btn my-btn-comm" @click="deleteComment">
                                         <i class="fa-regular fa-trash-can my-trash-icon"></i>
