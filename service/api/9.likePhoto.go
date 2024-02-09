@@ -4,7 +4,7 @@ package api
 go run ./cmd/webapi/
 curl -v \
 	-X PUT \
-	-H 'Authorization: 2' \
+	-H 'Authorization: 5' \
 	localhost:3000/likes/{1}
 */
 

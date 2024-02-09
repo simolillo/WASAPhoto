@@ -146,7 +146,7 @@ func createDatabase(db *sql.DB) error {
 			photoID INTEGER NOT NULL PRIMARY KEY,
 			authorID INTEGER NOT NULL REFERENCES users (userID),
 			format VARCHAR(3) NOT NULL,
-			date DATETIME NOT NULL
+			date TEXT NOT NULL
 			);`,
 		`CREATE TABLE IF NOT EXISTS likes (
 			likerID INTEGER NOT NULL REFERENCES users (userID),
@@ -158,7 +158,7 @@ func createDatabase(db *sql.DB) error {
 			photoID INTEGER NOT NULL REFERENCES photos (photoID),
 			authorID INTEGER NOT NULL REFERENCES users (userID),
 			commentText TEXT NOT NULL,
-			date DATETIME NOT NULL
+			date TEXT NOT NULL
 			);`,
 	}
 

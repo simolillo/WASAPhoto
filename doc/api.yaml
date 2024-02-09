@@ -100,6 +100,18 @@ components:
           example: png
         date:
           $ref: '#/components/schemas/Date'
+        likesList:
+          description: Users list.
+          type: array
+          minItems: 0
+          maxItems: 99
+          items: { $ref: '#/components/schemas/User' }
+        commentsList:
+          description: Comments list.
+          type: array
+          minItems: 0
+          maxItems: 99
+          items: { $ref: '#/components/schemas/Comment' }
 
     CommentText:
           description: Comment text.

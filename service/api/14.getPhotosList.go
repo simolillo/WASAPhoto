@@ -78,13 +78,15 @@ func (rt *_router) getPhotosList(w http.ResponseWriter, r *http.Request, ps http
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	for _, photo := range photosList {
-		photo.LikesList, err = rt.db.GetLikesList(photo.ID)
+	for i, photo := range photosList {
+		likesList, err := rt.db.GetLikesList(photo.ID)
+		photosList[i].LikesList = likesList
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		photo.CommentsList, err = rt.db.GetCommentsList(photo.ID)
+		commentsList, err := rt.db.GetCommentsList(photo.ID)
+		photosList[i].CommentsList = commentsList
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

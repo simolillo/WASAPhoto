@@ -213,7 +213,7 @@ export default {
                 <div class="row ">
                     <div class="col-12 d-flex justify-content-center">
                         <h2>Posts</h2>
-                        <input id="fileUploader" type="file" class="profile-file-upload" @change="uploadPhoto" accept=".jpg, .png, .jpeg">
+                        <input id="fileUploader" type="file" class="profile-file-upload" @change="uploadPhoto" accept=".jpg, .png">
                         <label v-if="isItMe" class="btn my-btn-add-photo ms-2 d-flex align-items-center" for="fileUploader"> Add </label>
                     </div>
                 </div>

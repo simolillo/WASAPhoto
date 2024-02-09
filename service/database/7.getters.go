@@ -155,7 +155,7 @@ func (db *appdbimpl) GetCommentsList(photoID uint64) (commentsList []Comment, er
 func (db *appdbimpl) GetMyStream(requestingUserID uint64) (stream []Photo, err error) {
 
 	query := `
-		SELECT * FROM photos
+		SELECT photoID, authorID, format, date FROM photos
 		INNER JOIN following ON authorID = followedID
 		WHERE followerID = ?
 		ORDER BY date DESC

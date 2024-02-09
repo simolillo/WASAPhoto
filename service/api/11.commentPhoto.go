@@ -5,8 +5,8 @@ go run ./cmd/webapi/
 curl -v \
 	-X POST \
 	-H 'Content-Type: text/plain' \
-	-H 'Authorization: 2' \
-	-d "Wow! This photo looks amazing" \
+	-H 'Authorization: 3' \
+	-d "sono cinese" \
 	localhost:3000/photos/{1}/comments/
 */
 

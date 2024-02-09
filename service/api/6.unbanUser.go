@@ -4,8 +4,8 @@ package api
 go run ./cmd/webapi/
 curl -v \
 	-X DELETE \
-	-H 'Authorization: 2' \
-	localhost:3000/banned/{1}
+	-H 'Authorization: 1' \
+	localhost:3000/banned/{2}
 */
 
 import (

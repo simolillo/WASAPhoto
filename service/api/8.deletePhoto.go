@@ -4,8 +4,8 @@ package api
 go run ./cmd/webapi/
 curl -v \
 	-X DELETE \
-	-H 'Authorization: 1' \
-	localhost:3000/photos/{1}/
+	-H 'Authorization: 3' \
+	localhost:3000/photos/{5}/
 */
 
 import (

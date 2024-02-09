@@ -10,6 +10,7 @@ func (db *appdbimpl) CommentPhoto(comment Comment) (dbComment Comment, err error
 	if err != nil {
 		return
 	}
+	dbComment = comment
 	commentID, err := sqlResult.LastInsertId()
 	dbComment.ID = uint64(commentID)
 	return

@@ -4,7 +4,7 @@ package api
 go run ./cmd/webapi/
 curl -v \
 	-X DELETE \
-	-H 'Authorization: 2' \
+	-H 'Authorization: 1' \
 	localhost:3000/photos/{1}/comments/{1}
 */
 

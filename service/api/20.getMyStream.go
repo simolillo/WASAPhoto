@@ -46,6 +46,20 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	for i, photo := range stream {
+		likesList, err := rt.db.GetLikesList(photo.ID)
+		stream[i].LikesList = likesList
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		commentsList, err := rt.db.GetCommentsList(photo.ID)
+		stream[i].CommentsList = commentsList
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

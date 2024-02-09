@@ -4,8 +4,8 @@ package api
 go run ./cmd/webapi/
 curl -v \
 	-X DELETE \
-	-H 'Authorization: 2' \
-	localhost:3000/likes/{1}
+	-H 'Authorization: 5' \
+	localhost:3000/likes/{6}
 */
 
 import (
