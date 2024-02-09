@@ -18,7 +18,7 @@ type Comment struct {
 	ID             uint64 `json:"commentID"`
 	PhotoID        uint64 `json:"photoID"`
 	AuthorID       uint64 `json:"authorID"`
-	AuthorUsername string `json:"uthorUsername"`
+	AuthorUsername string `json:"authorUsername"`
 	Text           string `json:"commentText"`
 	Date           string `json:"date"`
 }
