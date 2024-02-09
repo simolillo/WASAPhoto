@@ -141,7 +141,7 @@ func (db *appdbimpl) GetCommentsList(photoID uint64) (commentsList []Comment, er
 
 	for rows.Next() {
 		var comment Comment
-		err = rows.Scan(&comment.ID, &comment.PhotoID, &comment.AuthorID, &comment.Text, &comment.Date)
+		err = rows.Scan(&comment.ID, &comment.PhotoID, &comment.AuthorID, &comment.AuthorUsername, &comment.Text, &comment.Date)
 		if err != nil {
 			return
 		}
