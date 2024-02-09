@@ -79,12 +79,11 @@ export default {
 	<div class="container-fluid mt-3 mb-5 ">
 
         <CommentModal 
-        :modalID="'comment_modal'+photoID" 
-		:commentsList="allComments" 
-		:photo_owner="owner" 
+        :modalID="'commentModal'+photoID" 
+		:commentsList="commentsList" 
+		:isItMe="isItMe" 
 		:photoID="photoID"
-
-		@eliminateComment="removeCommentFromList"
+		@removeComment="removeCommentFromList"
 		@addComment="addCommentToList"
 		/>
 
@@ -116,7 +115,7 @@ export default {
                             </button>
                             <!--comment-->
                             <button class="my-trnsp-btn m-0 p-1  d-flex justify-content-center align-items-center" 
-							data-bs-toggle="modal" :data-bs-target="'#comment_modal'+photoID">
+							data-bs-toggle="modal" :data-bs-target="'#commentModal'+photoID">
                                 <i class="my-comment-color fa-regular fa-comment me-1"></i>
                                 <i class="my-comment-color-2"> {{commentsList.length}}</i>
                             </button>

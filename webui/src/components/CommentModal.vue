@@ -2,11 +2,12 @@
 export default {	
 	data(){
 		return{
+            token: localStorage.getItem('token'),
 			commentText:"",
 		}
 	},
 
-	props:['modalID','commentsList','photo_owner','photo_id'],
+	props:['modalID','commentsList','isItMe','photoID'],
 
 	methods: {
 		async commentPhoto() {
@@ -23,11 +24,11 @@ export default {
                 alert(this.errormsg);
             }
         },
-        async uncommentPhoto() {
+        async uncommentPhoto(commentID) {
             try {
                 // DELETE /photos/{pid}/comments/{cid}
-                await this.$axios.delete(`/photos/${this.photoID}/comments/${this.cid}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
-                this.$emit('removeComment', cid); // signal to parent
+                await this.$axios.delete(`/photos/${this.photoID}/comments/${commentID}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
+                this.$emit('removeComment', commentID); // signal to parent
             } catch(error) {
                 const status = error.response.status;
                 const reason = error.response.data;
@@ -57,38 +58,32 @@ export default {
                                     <h5>@{{comment.authorUsername}}</h5>
                                 </div>
                                 <div class="col-2">
-                                    <button v-if="user === author || user === photo_owner" class="btn my-btn-comm" @click="deleteComment">
+                                    <button v-if="token === comment.authorID || isItMe" class="btn my-btn-comm" @click="uncommentPhoto(comment.commentID)">
                                         <i class="fa-regular fa-trash-can my-trash-icon"></i>
                                     </button>
                                 </div>
-
                             </div>
-
                             <div class="row">
                                 <div class="col-12">
-                                    {{content}}
+                                    {{comment.commentText}}
                                 </div>
-
                             </div>
                             <hr>
-                            </div>
-
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-center w-100">
                     <div class="row w-100 ">
                         <div class="col-10">
                             <div class="mb-3 me-auto">
-                                
                                 <textarea class="form-control" id="exampleFormControlTextarea1" 
-								placeholder="Add a comment..." rows="1" maxLength="30" v-model="commentText"></textarea>
+								placeholder="Add a comment..." rows="1" maxLength="2200" v-model="commentText"></textarea>
                             </div>
                         </div>
-
                         <div class="col-2 d-flex align-items-center">
                             <button type="button" class="btn btn-primary" 
-							@click.prevent="addComment" 
-							:disabled="commentText.length < 1 || commentText.length > 30">
+							@click.prevent="commentPhoto" 
+							:disabled="commentText.length < 1 || commentText.length > 2200">
 							Send
 							</button>
                         </div>
@@ -97,7 +92,6 @@ export default {
             </div>
         </div>
     </div>
-
 </template>
 
 <style> 

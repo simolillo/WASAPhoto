@@ -29,7 +29,7 @@ func (db *appdbimpl) SearchCommentByID(ID uint64) (dbComment Comment, present bo
 	query := "SELECT * FROM comments WHERE commentID = ?;"
 
 	row := db.c.QueryRow(query, ID)
-	err = row.Scan(&dbComment.ID, &dbComment.PhotoID, &dbComment.AuthorID, &dbComment.Text, &dbComment.Date)
+	err = row.Scan(&dbComment.ID, &dbComment.PhotoID, &dbComment.AuthorID, &dbComment.AuthorUsername, &dbComment.Text, &dbComment.Date)
 	if err != nil && err != sql.ErrNoRows {
 		return
 	} else if err == sql.ErrNoRows {
