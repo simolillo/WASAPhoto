@@ -9,10 +9,10 @@ curl -v \
 */
 
 import (
-	"github.com/julienschmidt/httprouter"
-	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 	"net/http"
 	"strconv"
+	"github.com/julienschmidt/httprouter"
+	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
 )
 
 func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -46,7 +46,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 		http.Error(w, stringErr, http.StatusBadRequest)
 		return
 	}
-	_, present, err = rt.db.SearchPhotoByID(pathPid)
+	dbPhoto, present, err := rt.db.SearchPhotoByID(pathPid)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -58,7 +58,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	var pathCid uint64
-	pathCid, err = strconv.ParseUint(ps.ByName("pid"), 10, 64)
+	pathCid, err = strconv.ParseUint(ps.ByName("cid"), 10, 64)
 
 	// BadRequest check
 	if err != nil {
@@ -78,7 +78,8 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	// Forbidden check
-	if requestingUser.ID != comment.AuthorID {
+	isAuthor := requestingUser.ID == dbPhoto.AuthorID
+	if requestingUser.ID != comment.AuthorID && !isAuthor{
 		stringErr := "uncommentPhoto: requesting user not author of the comment"
 		http.Error(w, stringErr, http.StatusForbidden)
 		return

@@ -5,7 +5,7 @@ go run ./cmd/webapi/
 curl -v \
 	-X GET \
 	-H 'Authorization: 1' \
-	localhost:3000/users/{2}/
+	localhost:3000/users/{1}/
 */
 
 import (

@@ -6,7 +6,7 @@ curl -v \
 	-X POST \
 	-H 'Content-Type: text/plain' \
 	-H 'Authorization: 1' \
-	-d "sono cinese" \
+	-d "da papa" \
 	localhost:3000/photos/{1}/comments/
 */
 
