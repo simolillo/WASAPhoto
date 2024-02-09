@@ -27,7 +27,7 @@ func (db *appdbimpl) GetUserProfile(ID uint64) (dbProfile Profile, err error) {
 
 func (db *appdbimpl) GetPhotosList(authorID uint64) (photosList []Photo, err error) {
 
-	query := "SELECT * FROM photos WHERE authorID = ?;"
+	query := "SELECT * FROM photos WHERE authorID = ? ORDER BY date DESC;"
 
 	rows, err := db.c.Query(query, authorID)
 	if err != nil {
