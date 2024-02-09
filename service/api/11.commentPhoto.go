@@ -5,7 +5,7 @@ go run ./cmd/webapi/
 curl -v \
 	-X POST \
 	-H 'Content-Type: text/plain' \
-	-H 'Authorization: 3' \
+	-H 'Authorization: 1' \
 	-d "sono cinese" \
 	localhost:3000/photos/{1}/comments/
 */
@@ -82,10 +82,11 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 	commentText := string(body)
 	comment := Comment{
-		PhotoID:  photo.ID,
-		AuthorID: author.ID,
-		Text:     commentText,
-		Date:     time.Now().Format("2006-01-02 15:04:05"),
+		PhotoID:        photo.ID,
+		AuthorID:       author.ID,
+		AuthorUsername: author.Name,
+		Text:           commentText,
+		Date:           time.Now().Format("2006-01-02 15:04:05"),
 	}
 
 	// database section

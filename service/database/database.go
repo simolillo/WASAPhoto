@@ -157,6 +157,7 @@ func createDatabase(db *sql.DB) error {
 			commentID INTEGER NOT NULL PRIMARY KEY,
 			photoID INTEGER NOT NULL REFERENCES photos (photoID),
 			authorID INTEGER NOT NULL REFERENCES users (userID),
+			authorUsername VARCHAR(16) NOT NULL REFERENCES users (username),
 			commentText TEXT NOT NULL,
 			date TEXT NOT NULL
 			);`,

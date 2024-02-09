@@ -4,9 +4,9 @@ import "database/sql"
 
 func (db *appdbimpl) CommentPhoto(comment Comment) (dbComment Comment, err error) {
 
-	query := "INSERT INTO comments (photoID, authorID, commentText, date) VALUES (?,?,?,?);"
+	query := "INSERT INTO comments (photoID, authorID, authorUsername, commentText, date) VALUES (?,?,?,?,?);"
 
-	sqlResult, err := db.c.Exec(query, comment.PhotoID, comment.AuthorID, comment.Text, comment.Date)
+	sqlResult, err := db.c.Exec(query, comment.PhotoID, comment.AuthorID, comment.AuthorUsername, comment.Text, comment.Date)
 	if err != nil {
 		return
 	}

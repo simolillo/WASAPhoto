@@ -15,11 +15,12 @@ type Photo struct {
 }
 
 type Comment struct {
-	ID       uint64 `json:"commentID"`
-	PhotoID  uint64 `json:"photoID"`
-	AuthorID uint64 `json:"authorID"`
-	Text     string `json:"commentText"`
-	Date     string `json:"date"`
+	ID             uint64 `json:"commentID"`
+	PhotoID        uint64 `json:"photoID"`
+	AuthorID       uint64 `json:"authorID"`
+	AuthorUsername string `json:"uthorUsername"`
+	Text           string `json:"commentText"`
+	Date           string `json:"date"`
 }
 
 type Profile struct {
