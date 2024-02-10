@@ -22,7 +22,7 @@ export default {
 			try {
 				// DELETE /photos/{pid}/
 				await this.$axios.delete(`/photos/${this.photoID}/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
-				this.$emit('removePhoto', this.photoID); // signal to parent
+				this.$emit("removePhoto", this.photoID);
 			} catch (error) {
                 const status = error.response.status;
         		const reason = error.response.data;
@@ -32,7 +32,7 @@ export default {
 		},
 		visitAuthorProfile() {
             // /profiles/:username
-			this.$router.push(`/profiles/${this.authorUsername}`)
+			this.$router.push(`/profiles/${this.authorUsername}`);
 		},
 		async likeToggle() {
 			try {

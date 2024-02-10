@@ -16,7 +16,7 @@ export default {
                 let response = await this.$axios.post(`/photos/${this.photoID}/comments/`, this.commentText, {headers: {'Authorization': `${localStorage.getItem('token')}`, 'Content-Type': 'text/plain'}});
                 let comment = response.data;
                 this.$emit('addComment', comment); // signal to parent
-                this.commentText = ""
+                this.commentText = "";
             } catch(error) {
                 const status = error.response.status;
                 const reason = error.response.data;

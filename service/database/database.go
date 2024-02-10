@@ -129,7 +129,7 @@ func (db *appdbimpl) Ping() error {
 func createDatabase(db *sql.DB) error {
 	tables := [6]string{
 		`CREATE TABLE IF NOT EXISTS users (
-			userID INTEGER NOT NULL PRIMARY KEY,
+			userID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			username VARCHAR(16) NOT NULL UNIQUE
 			);`,
 		`CREATE TABLE IF NOT EXISTS following (
@@ -143,7 +143,7 @@ func createDatabase(db *sql.DB) error {
 			PRIMARY KEY (bannerID, bannedID)
 			);`,
 		`CREATE TABLE IF NOT EXISTS photos (
-			photoID INTEGER NOT NULL PRIMARY KEY,
+			photoID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			authorID INTEGER NOT NULL REFERENCES users (userID),
 			format VARCHAR(3) NOT NULL,
 			date TEXT NOT NULL
@@ -154,7 +154,7 @@ func createDatabase(db *sql.DB) error {
 			PRIMARY KEY (likerID, photoID)
 			);`,
 		`CREATE TABLE IF NOT EXISTS comments (
-			commentID INTEGER NOT NULL PRIMARY KEY,
+			commentID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			photoID INTEGER NOT NULL REFERENCES photos (photoID),
 			authorID INTEGER NOT NULL REFERENCES users (userID),
 			authorUsername VARCHAR(16) NOT NULL REFERENCES users (username),

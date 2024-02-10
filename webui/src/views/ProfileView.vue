@@ -31,7 +31,7 @@ export default {
         }
     },
     computed: {
-        pathUsername(){
+        pathUsername() {
             return this.$route.params.username
         },
     },
@@ -110,7 +110,6 @@ export default {
                     let response = await this.$axios.post('/photos/', reader.result, {headers: {'Authorization': `${localStorage.getItem('token')}`, 'Content-Type': 'image/*'}});
                     this.photosList.unshift(response.data); // at the beginning of the list
                     this.photosCount += 1;
-                    location.reload(); // same as the reload button in your browser
                 }
             } catch (error) {
                 const status = error.response.status;
@@ -129,9 +128,10 @@ export default {
                 this.errormsg = `Status ${status}: ${reason}`;
             }
         },
+        // on child event
         removePhotoFromList(photoID){
 			this.photosList = this.photosList.filter(photo => photo.photoID != photoID);
-            this.photosCount -= 1
+            this.photosCount -= 1;
 		},
     },
     mounted() {
@@ -203,6 +203,7 @@ export default {
             <div class="col">
                 <div v-if="!isInMyBannedList && photosCount>0">
                     <Photo v-for="photo in photosList"
+                    :key="photo.photoID"
                     :photoID="photo.photoID"
                     :authorID="photo.authorID"
                     :authorUsername="this.username"
