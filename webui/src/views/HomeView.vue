@@ -18,6 +18,18 @@ export default {
         		const reason = error.response.data;
                 this.errormsg = `Status ${status}: ${reason}`;
             }
+		},
+		async getAuthorUsername(authorID) {
+			try {
+				// GET /stream
+                let response = await this.$axios.get('/stream', {headers: {'Authorization': `${localStorage.getItem('token')}`}});
+				this.photos = response.data === null ? [] : response.data;
+				console.log(this.photos)
+			} catch (error) {
+				const status = error.response.status;
+        		const reason = error.response.data;
+                this.errormsg = `Status ${status}: ${reason}`;
+            }
 		}
 	},
 	async mounted() {
