@@ -58,7 +58,7 @@ export default {
 			this.commentsList = this.commentsList.filter(comment => comment.commentID != commentID);
 		},
 		addCommentToList(comment){
-			this.commentsList.push(comment);
+			this.commentsList.unshift(comment); // at the beginning of the list
 		},
 	},
 	async mounted() {
@@ -78,7 +78,7 @@ export default {
 <template>
 	<div class="container-fluid mt-3 mb-5 ">
 
-        <CommentModal 
+        <CommentModal
         :modalID="'commentModal'+photoID" 
 		:commentsList="commentsList" 
 		:isItMe="isItMe" 

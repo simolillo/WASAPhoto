@@ -131,7 +131,7 @@ func (db *appdbimpl) GetLikesList(photoID uint64) (likesList []User, err error) 
 
 func (db *appdbimpl) GetCommentsList(photoID uint64) (commentsList []Comment, err error) {
 
-	query := "SELECT * FROM comments WHERE photoID = ?;"
+	query := "SELECT * FROM comments WHERE photoID = ? ORDER BY date DESC;"
 
 	rows, err := db.c.Query(query, photoID)
 	if err != nil {

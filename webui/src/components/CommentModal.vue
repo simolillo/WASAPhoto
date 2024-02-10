@@ -58,7 +58,7 @@ export default {
                                     <h5>@{{comment.authorUsername}}</h5>
                                 </div>
                                 <div class="col-2">
-                                    <button v-if="token === comment.authorID || isItMe" class="btn my-btn-comm" @click="uncommentPhoto(comment.commentID)">
+                                    <button v-if="token == comment.authorID || isItMe" class="btn my-btn-comm" @click="uncommentPhoto(comment.commentID)">
                                         <i class="fa-regular fa-trash-can my-trash-icon"></i>
                                     </button>
                                 </div>
