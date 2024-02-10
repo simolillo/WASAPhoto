@@ -43,7 +43,7 @@ export default {
 
 <template>
     <div class="modal fade my-modal-disp-none" :id="modalID" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog modal-dialog-scrollable ">
+        <div class="modal-dialog modal-dialog-centered modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" :id="modalID">Comments</h1>
@@ -103,7 +103,7 @@ export default {
 }
 .my-btn-comm:hover{
     border: none;
-    color: var(--color-red-danger);
+    color: red;
     transform: scale(1.1);
 }
 </style>

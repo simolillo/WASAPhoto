@@ -60,6 +60,14 @@ export default {
 		addCommentToList(comment){
 			this.commentsList.unshift(comment); // at the beginning of the list
 		},
+        visitLiker(username) {
+            if (username != this.$route.params.username) {
+                document.querySelector('.modal-backdrop').remove();
+                document.querySelector('.modal').remove();
+                document.body.style.overflow = 'auto';
+                this.$router.push(`/profiles/${username}`);
+            }
+        }
 	},
 	async mounted() {
         this.getPhoto()
@@ -81,6 +89,7 @@ export default {
         <LikeModal
         :modalID="'likeModal'+photoID" 
 		:likesList="likesList"
+        @visitLiker="visitLiker"
         />
 
         <CommentModal
