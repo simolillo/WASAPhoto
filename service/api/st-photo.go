@@ -8,7 +8,7 @@ import (
 type Photo struct {
 	ID             uint64             `json:"photoID"`
 	AuthorID       uint64             `json:"authorID"`
-	AuthorUsername string             `json:"AuthorUsername"`
+	AuthorUsername string             `json:"authorUsername"`
 	Format         string             `json:"format"`
 	Date           string             `json:"date"`
 	LikesList      []database.User    `json:"likesList"`
