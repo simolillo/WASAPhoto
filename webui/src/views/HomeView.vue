@@ -45,7 +45,7 @@ export default {
 			:key="photo.photoID"
 			:photoID="photo.photoID"
 			:authorID="photo.authorID"
-			:authorUsername="this.username"
+			:authorUsername="photo.authorUsername"
 			:date="photo.date"
 			:likesListParent="photo.likesList"
 			:commentsListParent="photo.commentsList"
