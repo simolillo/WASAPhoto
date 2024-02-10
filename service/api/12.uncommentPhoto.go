@@ -9,10 +9,10 @@ curl -v \
 */
 
 import (
-	"net/http"
-	"strconv"
 	"github.com/julienschmidt/httprouter"
 	"github.com/simolillo/WASAPhoto/service/api/reqcontext"
+	"net/http"
+	"strconv"
 )
 
 func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -79,7 +79,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 
 	// Forbidden check
 	isAuthor := requestingUser.ID == dbPhoto.AuthorID
-	if requestingUser.ID != comment.AuthorID && !isAuthor{
+	if requestingUser.ID != comment.AuthorID && !isAuthor {
 		stringErr := "uncommentPhoto: requesting user not author of the comment"
 		http.Error(w, stringErr, http.StatusForbidden)
 		return
