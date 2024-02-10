@@ -1,12 +1,12 @@
 <script>
 export default {
 
-	props:['modalID','likesList'],
+	props:['modalID','usersList'],
 
     methods: {
-        visitLiker(username) {
+        visitUser(username) {
             // /profiles/:username
-            this.$emit('visitLiker', username); // signal to parent
+            this.$emit('visitUser', username); // signal to parent
 		},
     }
 }
@@ -17,10 +17,10 @@ export default {
         <div class="modal-dialog modal-dialog-centered modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" :id="modalID">Likes</h1>
+                    <h1 class="modal-title fs-5" :id="modalID">{{ modalID.slice(0, 5) }}</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div v-for="user in likesList">
+                <div v-for="user in usersList">
                     <div class="modal-body">
                         <div class="container-fluid">
                             <hr>
@@ -28,7 +28,7 @@ export default {
                                 <div class="col d-flex justify-content-center">
                                     <div class="user-mini-card card bg-transparent border-start">
                                         <div class="card-body">
-                                            <h5 @click="visitLiker(user.username)" class="user-mini-card-title d-flex justify-content-center ">@{{ user.username }}</h5>
+                                            <h5 @click="visitUser(user.username)" class="user-mini-card-title d-flex justify-content-center ">@{{ user.username }}</h5>
                                         </div>
                                     </div>
                                 </div>

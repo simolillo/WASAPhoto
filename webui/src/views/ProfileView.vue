@@ -18,6 +18,12 @@ export default {
             // getPhotosList
             photosList: [],
 
+            // getFollowersList
+            followersList: [],
+
+            // getFollowingsList
+            followingsList: [],
+
             userExists: false,
             userID: 0,
 		}
@@ -59,6 +65,8 @@ export default {
                 this.amIBanned = profile.amIBanned;
                 this.userExists = true;
                 await this.getPhotosList();
+                this.getFollowersList();
+                this.getFollowingsList();
             } catch (error) {
                 const status = error.response.status;
         		const reason = error.response.data;
@@ -70,11 +78,11 @@ export default {
                 if (this.doIFollowUser) { 
                      // DELETE /following/{uid}
                     await this.$axios.delete(`/following/${this.userID}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
-                    this.followersCount -=1
+                    this.getUserProfile();
                 } else {
                     // PUT /following/{uid}
                     await this.$axios.put(`/following/${this.userID}`, null, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
-                    this.followersCount +=1
+                    this.getUserProfile();
                 }
                 this.doIFollowUser = !this.doIFollowUser
             } catch (error) {
@@ -128,11 +136,38 @@ export default {
                 this.errormsg = `Status ${status}: ${reason}`;
             }
         },
+        async getFollowersList() {
+            try {
+                // GET /users/{1}/followers/
+                let response = await this.$axios.get(`/users/${this.userID}/followers/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
+                this.followersList = response.data === null ? [] : response.data;
+            } catch (error) {
+				const status = error.response.status;
+        		const reason = error.response.data;
+                this.errormsg = `Status ${status}: ${reason}`;
+            }
+        },
+        async getFollowingsList() {
+            try {
+                // GET /users/{1}/followings/
+                let response = await this.$axios.get(`/users/${this.userID}/followings/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
+                this.followingsList = response.data === null ? [] : response.data;
+            } catch (error) {
+				const status = error.response.status;
+        		const reason = error.response.data;
+                this.errormsg = `Status ${status}: ${reason}`;
+            }
+        },
         // on child event
         removePhotoFromList(photoID){
 			this.photosList = this.photosList.filter(photo => photo.photoID != photoID);
             this.photosCount -= 1;
 		},
+        visitUser(username) {
+            if (username != this.$route.params.username) {
+                this.$router.push(`/profiles/${username}`);
+            }
+        }
     },
     mounted() {
         this.getUserProfile();
@@ -141,6 +176,18 @@ export default {
 </script>
 
 <template>
+
+    <UsersModal
+    :modalID="'usersModalFollowers'" 
+    :usersList="followersList"
+    @visitUser="visitUser"
+    />
+
+    <UsersModal
+    :modalID="'usersModalFollowing'" 
+    :usersList="followingsList"
+    @visitUser="visitUser"
+    />
 
     <div class="container-fluid" v-if="userExists && !amIBanned">
         <div class="row">
@@ -163,17 +210,21 @@ export default {
                     </div>
 
                     <div v-if="!isInMyBannedList" class="row mt-1 mb-1">
-                        <div class="col-4 d-flex justify-content-start">
+                        <button class="col-4 d-flex justify-content-center btn-foll">
                             <h6 class="ms-3 p-0 ">Posts: {{photosCount}}</h6>
-                        </div>
+                        </button>
                     
-                        <div class="col-4 d-flex justify-content-center">
-                            <h6 class=" p-0 ">Followers: {{followersCount}}</h6>
-                        </div>
+                        <button class="col-4 d-flex justify-content-center btn-foll">
+                            <h6 data-bs-toggle="modal" :data-bs-target="'#usersModalFollowers'">
+                                Followers: {{followersList.length}}
+                            </h6>
+                        </button>
                     
-                        <div class="col-4 d-flex justify-content-end">
-                            <h6 class=" p-0 me-3">Following: {{followingCount}}</h6>
-                        </div>
+                        <button class="col-4 d-flex justify-content-center btn-foll">
+                            <h6 data-bs-toggle="modal" :data-bs-target="'#usersModalFollowing'">
+                                Following: {{followingsList.length}}
+                            </h6>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -238,5 +289,10 @@ export default {
     color: white;
     background-color: green;
     border-color: grey;
+}
+.btn-foll{
+    background-color: transparent;
+    border: none;
+    padding: 5px;
 }
 </style>

@@ -86,10 +86,10 @@ export default {
 <template>
 	<div class="container-fluid mt-3 mb-5 ">
 
-        <LikeModal
-        :modalID="'likeModal'+photoID" 
-		:likesList="likesList"
-        @visitLiker="visitLiker"
+        <UsersModal
+        :modalID="'likesModal'+photoID" 
+		:usersList="likesList"
+        @visitUser="visitLiker"
         />
 
         <CommentModal
@@ -123,7 +123,7 @@ export default {
                             <!--like-->
                             <button class="my-trnsp-btn m-0 p-1 d-flex justify-content-center align-items-center">
                                 <i @click="likeToggle" :class="'me-1 my-heart-color w-100 h-100 fa '+(liked ? 'fa-heart' : 'fa-heart-o')"></i>
-                                <i data-bs-toggle="modal" :data-bs-target="'#likeModal'+photoID" class="my-comment-color ">
+                                <i data-bs-toggle="modal" :data-bs-target="'#likesModal'+photoID" class="my-comment-color ">
                                     {{likesList.length}}
                                 </i>
                             </button>
