@@ -6,12 +6,13 @@ type User struct {
 }
 
 type Photo struct {
-	ID           uint64    `json:"photoID"`
-	AuthorID     uint64    `json:"authorID"`
-	Format       string    `json:"format"`
-	Date         string    `json:"date"`
-	LikesList    []User    `json:"likesList"`
-	CommentsList []Comment `json:"commentsList"`
+	ID             uint64    `json:"photoID"`
+	AuthorID       uint64    `json:"authorID"`
+	AuthorUsername string    `json:"AuthorUsername"`
+	Format         string    `json:"format"`
+	Date           string    `json:"date"`
+	LikesList      []User    `json:"likesList"`
+	CommentsList   []Comment `json:"commentsList"`
 }
 
 type Comment struct {

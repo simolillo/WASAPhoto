@@ -173,6 +173,8 @@ func (db *appdbimpl) GetMyStream(requestingUserID uint64) (stream []Photo, err e
 		if err != nil {
 			return
 		}
+		author, _, _ := db.SearchUserByID(photo.AuthorID)
+		photo.AuthorUsername = author.Name
 		stream = append(stream, photo)
 	}
 
