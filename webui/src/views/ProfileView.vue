@@ -210,7 +210,7 @@ export default {
                     :date="photo.date"
                     :likesListParent="photo.likesList"
                     :commentsListParent="photo.commentsList"
-                    :isItMe="isItMe" 
+                    :isItMe="isItMe"
                     @removePhoto="removePhotoFromList"
                     />
                 </div>

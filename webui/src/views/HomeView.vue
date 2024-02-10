@@ -1,54 +1,49 @@
 <script>
+// stream
 export default {
-	data: function() {
+	data: function () {
 		return {
-			errormsg: null,
-			loading: false,
-			some_data: null,
+			photos: [],
 		}
 	},
 	methods: {
-		async refresh() {
-			this.loading = true;
-			this.errormsg = null;
+		async getMyStream() {
 			try {
-				//let response = await this.$axios.get("/");
-				this.some_data = response.data;
-			} catch (e) {
-				this.errormsg = e.toString();
-			}
-			this.loading = false;
-		},
+				// GET /stream
+                let response = await this.$axios.get('/stream', {headers: {'Authorization': `${localStorage.getItem('token')}`}});
+				this.photos = response.data === null ? [] : response.data;
+				console.log(this.photos)
+			} catch (error) {
+				const status = error.response.status;
+        		const reason = error.response.data;
+                this.errormsg = `Status ${status}: ${reason}`;
+            }
+		}
 	},
-	mounted() {
-		this.refresh()
+	async mounted() {
+		await this.getMyStream()
 	}
 }
 </script>
 
 <template>
-	<div>
-		<div
-			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h1 class="h2">Home page</h1>
-			<div class="btn-toolbar mb-2 mb-md-0">
-				<div class="btn-group me-2">
-					<button type="button" class="btn btn-sm btn-outline-secondary" @click="refresh">
-						Refresh
-					</button>
-					<button type="button" class="btn btn-sm btn-outline-secondary" @click="exportList">
-						Export
-					</button>
-				</div>
-				<div class="btn-group me-2">
-					<button type="button" class="btn btn-sm btn-outline-primary" @click="newItem">
-						New
-					</button>
-				</div>
-			</div>
+	<div class="container-fluid">
+		<div class="row">
+			<Photo v-for="photo in photos"
+			:key="photo.photoID"
+			:photoID="photo.photoID"
+			:authorID="photo.authorID"
+			:authorUsername="this.username"
+			:date="photo.date"
+			:likesListParent="photo.likesList"
+			:commentsListParent="photo.commentsList"
+			:isItMe="isItMe"
+			@removePhoto="removePhotoFromList"
+			/>
 		</div>
-
-		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
+		<div v-if="photos.length === 0" class="row">
+			<h1 class="d-flex justify-content-center mt-5" style="color: rgb(0, 0, 0);">There's no content yet, follow somebody!</h1>
+		</div>
 	</div>
 </template>
 
