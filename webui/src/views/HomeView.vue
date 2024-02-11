@@ -50,7 +50,6 @@ export default {
 			:likesListParent="photo.likesList"
 			:commentsListParent="photo.commentsList"
 			:isItMe="false"
-			@removePhoto="removePhotoFromList"
 			/>
 		</div>
 		<div v-if="photos.length === 0" class="row">

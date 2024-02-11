@@ -49,21 +49,18 @@ export default {
 							</div>
 							<div class="d-grid gap-3">
 								<button
-									v-if="!loading"
 									class="btn btn-primary rounded-pill"
 									type="submit"
 									@click="setMyUsername"
 									style="background-color: #000000">
 									Update
 								</button>
-								<LoadingSpinner v-if="loading" />
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<ErrorMsg class="error-container" v-if="errormsg" :msg="errormsg" />
 	</div>
 </template>
 
