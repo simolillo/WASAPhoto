@@ -64,9 +64,11 @@ export default {
                 this.isInMyBannedList = profile.isInMyBannedList;
                 this.amIBanned = profile.amIBanned;
                 this.userExists = true;
-                await this.getPhotosList();
-                this.getFollowersList();
-                this.getFollowingsList();
+                if (!this.isInMyBannedList && !this.amIBanned) {
+                    await this.getPhotosList();
+                    this.getFollowersList();
+                    this.getFollowingsList();
+                }
             } catch (error) {
                 const status = error.response.status;
         		const reason = error.response.data;
