@@ -35,7 +35,7 @@ export default {
         </form>
     </div>
 
-    <div v-for="user in users">
+    <div v-for="user in users" :key="user.userID">
         <div class="modal-body">
             <div class="container-fluid">
                 <div class="row mb-2 mt-2">

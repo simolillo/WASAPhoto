@@ -20,7 +20,7 @@ export default {
                     <h1 class="modal-title fs-5" :id="modalID">{{ modalID.slice(0, 5) }}</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div v-for="user in usersList">
+                <div v-for="user in usersList" :key="user.userID">
                     <div class="modal-body">
                         <div class="container-fluid">
                             <hr>

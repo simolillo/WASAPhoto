@@ -49,7 +49,7 @@ export default {
                     <h1 class="modal-title fs-5" :id="modalID">Comments</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div v-for="comment in commentsList">
+                <div v-for="comment in commentsList" :key="comment.commentID">
                     <div class="modal-body">
                         <div class="container-fluid">
                             <hr>
