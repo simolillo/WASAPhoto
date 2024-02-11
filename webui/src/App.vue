@@ -126,13 +126,11 @@ export default {
 								</div>
 								<div class="d-grid gap-3" @click="doLogin">
 									<button
-										v-if="!loading"
 										class="btn btn-primary rounded-pill"
 										type="submit"
 										style="background-color: #000000">
 										Login
 									</button>
-									<LoadingSpinner v-if="loading" />
 								</div>
 							</div>
 						</div>

@@ -13,6 +13,8 @@ export default {
 </script>
 
 <template>
+	<!--child elem required-->
+	<span></span>
 </template>
 
 <style>
