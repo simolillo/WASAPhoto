@@ -599,37 +599,37 @@ paths:
           # Internal Server Error
           $ref: '#/components/responses/InternalServerError'
 
-    get:
-      operationId: getCommentsList
-      tags: [getters]
-      summary: get photo comments
-      description: Get the list of comments for a specific photo.
-      responses:
-        "200":
-          # OK
-          description: List of photo comments retrieved successfully.
-          content:
-            application/json:
-              schema:
-                description: Comments list.
-                type: array
-                minItems: 0
-                maxItems: 99
-                items: { $ref: '#/components/schemas/Comment' }
-        "400":
-          # Bad Request
-          description: |-
-            Invalid path parameter pid or;
-            pid not matching any existing photo.
-        "401":
-          # Unauthorized
-          $ref: '#/components/responses/Unauthorized'
-        "403":
-          # Forbidden
-          $ref: '#/components/responses/Forbidden'
-        "500":
-          # Internal Server Error
-          $ref: '#/components/responses/InternalServerError'
+    # get:
+    #   operationId: getCommentsList
+    #   tags: [getters]
+    #   summary: get photo comments
+    #   description: Get the list of comments for a specific photo.
+    #   responses:
+    #     "200":
+    #       # OK
+    #       description: List of photo comments retrieved successfully.
+    #       content:
+    #         application/json:
+    #           schema:
+    #             description: Comments list.
+    #             type: array
+    #             minItems: 0
+    #             maxItems: 99
+    #             items: { $ref: '#/components/schemas/Comment' }
+    #     "400":
+    #       # Bad Request
+    #       description: |-
+    #         Invalid path parameter pid or;
+    #         pid not matching any existing photo.
+    #     "401":
+    #       # Unauthorized
+    #       $ref: '#/components/responses/Unauthorized'
+    #     "403":
+    #       # Forbidden
+    #       $ref: '#/components/responses/Forbidden'
+    #     "500":
+    #       # Internal Server Error
+    #       $ref: '#/components/responses/InternalServerError'
 
 
   /photos/{pid}/comments/{cid}:
