@@ -19,8 +19,14 @@ func (db *appdbimpl) CreateUser(username string) (dbUser User, err error) {
 func (db *appdbimpl) UpdateUsername(dbUser User) (err error) {
 
 	query := "UPDATE users SET username = ? WHERE userID = ?;"
-
 	_, err = db.c.Exec(query, dbUser.Name, dbUser.ID)
+	if err != nil {
+		return
+	}
+
+	query = "UPDATE comments SET authorUsername = ? WHERE authorID = ?;"
+	_, err = db.c.Exec(query, dbUser.Name, dbUser.ID)
+
 	return
 }
 

@@ -6,7 +6,7 @@ curl -v \
 	-X PUT \
 	-H 'Authorization: 1' \
 	-H 'Content-Type: application/json' \
-	-d '{"username": "lillo"}' \
+	-d '{"username": "lillino"}' \
 	localhost:3000/settings
 */
 
