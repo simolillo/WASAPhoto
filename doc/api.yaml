@@ -489,23 +489,23 @@ paths:
           # Internal Server Error
           $ref: '#/components/responses/InternalServerError'
 
-    get:
-      operationId: getPhoto
-      tags: [getters]
-      summary: get binary image
-      description: Get binary image.
-      responses:
-        "200":
-          # OK
-          description: Photo file retrieved successfully.
-          content:
-            image/*:
-              schema: { $ref: '#/components/schemas/BinaryImage' }
-        "400":
-          # Bad Request
-          description: |-
-            Invalid path parameter pid or;
-            pid not matching any existing photo.
+    # get:
+    #   operationId: getPhoto
+    #   tags: [getters]
+    #   summary: get binary image
+    #   description: Get binary image.
+    #   responses:
+    #     "200":
+    #       # OK
+    #       description: Photo file retrieved successfully.
+    #       content:
+    #         image/*:
+    #           schema: { $ref: '#/components/schemas/BinaryImage' }
+    #     "400":
+    #       # Bad Request
+    #       description: |-
+    #         Invalid path parameter pid or;
+    #         pid not matching any existing photo.
 
 
   /likes/{pid}:
