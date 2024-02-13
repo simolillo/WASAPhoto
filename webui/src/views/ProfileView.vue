@@ -48,6 +48,7 @@ export default {
             }
             try {
                 // /profiles/username
+                // getUserId
                 // GET /user/{username}
                 let username = this.$route.params.username;
                 let response = await this.$axios.get(`/user/${username}`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
@@ -140,7 +141,7 @@ export default {
         },
         async getFollowersList() {
             try {
-                // GET /users/{1}/followers/
+                // GET /users/{uid}/followers/
                 let response = await this.$axios.get(`/users/${this.userID}/followers/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
                 this.followersList = response.data === null ? [] : response.data;
             } catch (error) {
@@ -151,7 +152,7 @@ export default {
         },
         async getFollowingsList() {
             try {
-                // GET /users/{1}/followings/
+                // GET /users/{uid}/followings/
                 let response = await this.$axios.get(`/users/${this.userID}/followings/`, {headers: {'Authorization': `${localStorage.getItem('token')}`}});
                 this.followingsList = response.data === null ? [] : response.data;
             } catch (error) {
